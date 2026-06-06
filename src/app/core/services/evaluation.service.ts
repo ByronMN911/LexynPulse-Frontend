@@ -19,7 +19,7 @@ export class EvaluationService {
    * Endpoint backend: GET /api/evaluaciones/cuestionario
    */
   getCuestionario(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/cuestionario`);
+    return this.http.get<any[]>(`${this.apiUrl}/evaluaciones/cuestionario`);
   }
 
   /*
@@ -27,7 +27,7 @@ export class EvaluationService {
    * Endpoint backend: POST /api/evaluaciones/procesar
    */
   procesarEvaluacion(payload: { respuestas: any[] }): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/procesar`, payload);
+    return this.http.post<any>(`${this.apiUrl}/evaluaciones/procesar`, payload);
   }
 
   /*
@@ -35,7 +35,7 @@ export class EvaluationService {
    * Endpoint backend: GET /api/evaluaciones/usuario/:id
    */
   getHistorialUsuario(usuarioId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${`${this.apiUrl}/usuario`}/${usuarioId}`);
+    return this.http.get<any[]>(`${`${this.apiUrl}/evaluaciones/usuario`}/${usuarioId}`);
   }
 
   /**
@@ -43,7 +43,7 @@ export class EvaluationService {
    * Endpoint backend: GET /api/evaluaciones/reporte/:id
    */
   getReporteIndividual(evaluacionId: string): Observable<any> { 
-    return this.http.get<any>(`${this.apiUrl}/reporte/${evaluacionId}`);
+    return this.http.get<any>(`${this.apiUrl}/evaluaciones/reporte/${evaluacionId}`);
   }
 
   /*
@@ -52,6 +52,6 @@ export class EvaluationService {
    * Backend: GET /api/evaluaciones/dashboard
    */
   getDashboardGlobal(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/dashboard`);
+    return this.http.get<any[]>(`${this.apiUrl}/evaluaciones/dashboard`);
   }
 }

@@ -45,7 +45,7 @@ export class AuthService {
    * reactivos de autenticación.
    */
   login(correo: string, password: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/login`, { correo, password }).pipe(
+    return this.http.post<any>(`${this.apiUrl}/auth/login`, { correo, password }).pipe(
       tap(response => {
         if (response && response.token) {
           localStorage.setItem('access_token', response.token);
@@ -103,7 +103,7 @@ export class AuthService {
    * Backend: POST /api/auth/register
    */
   registrarCliente(payload: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/register`, payload);
+    return this.http.post<any>(`${this.apiUrl}/auth/register`, payload);
   }
 
   /*
@@ -111,7 +111,7 @@ export class AuthService {
    * Backend: GET /api/auth/clientes
    */
   obtenerClientes(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/clientes`);
+    return this.http.get<any[]>(`${this.apiUrl}/auth/clientes`);
   }
 
   /*
@@ -119,7 +119,7 @@ export class AuthService {
    * Backend: PUT /api/auth/clientes/:id
    */
   actualizarCliente(id: string, payload: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/clientes/${id}`, payload);
+    return this.http.put<any>(`${this.apiUrl}/auth/clientes/${id}`, payload);
   }
 
   

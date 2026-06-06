@@ -26,7 +26,7 @@ export class PreguntaService {
    * completo junto con la información requerida por la interfaz.
    */
   obtenerDashboardPreguntas(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/dashboard`);
+    return this.http.get<any[]>(`${this.apiUrl}/preguntas/dashboard`);
   }
 
   /*
