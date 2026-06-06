@@ -1,6 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environmet'; 
+
 
 /*
  * Servicio especializado en la gestión administrativa del banco de preguntas.
@@ -13,7 +15,7 @@ import { Observable } from 'rxjs';
 export class PreguntaService {
   
   // URL base del módulo de preguntas apuntando al controlador correspondiente del backend
-  private apiUrl = 'https://lexyn-pulse-api.onrender.com/api';
+  private apiUrl = environment.apiUrl;
   
   // Inyección funcional del cliente HTTP para la comunicación con la API REST
   private http = inject(HttpClient);

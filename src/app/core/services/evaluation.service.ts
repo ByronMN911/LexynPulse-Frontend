@@ -1,13 +1,15 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environmet'; 
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class EvaluationService {
   // URL base unificada apuntando al controlador de evaluaciones de Express
-  private apiUrl = 'https://lexyn-pulse-api.onrender.com/api';
+  private apiUrl = environment.apiUrl;
   
   // Inyección funcional del cliente HTTP nativo
   private http = inject(HttpClient);

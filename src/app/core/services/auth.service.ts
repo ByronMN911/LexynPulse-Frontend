@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
+import { environment } from '../../../environments/environmet'; 
 
 /*
  * Decorador de Angular que registra este servicio en el inyector
@@ -24,7 +25,7 @@ export class AuthService {
    * URL base apuntando al módulo de autenticación expuesto
    * por el backend Node.js.
    */
-  private apiUrl = 'https://lexyn-pulse-api.onrender.com/api';
+  private apiUrl = environment.apiUrl;
   
   /*
    * Flujo reactivo que mantiene y distribuye el estado actual
