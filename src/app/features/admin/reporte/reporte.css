@@ -1,0 +1,54 @@
+.admin-layout { min-height: 100vh; background-color: #f1f5f9; font-family: 'Inter', system-ui, sans-serif; }
+.admin-header { background-color: #0f172a; color: #ffffff; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 50; }
+.brand-zone { display: flex; align-items: center; gap: 0.75rem; }
+.brand-icon { font-size: 1.5rem; color: #3b82f6; }
+.brand-text { display: flex; flex-direction: column; }
+.app-title { font-size: 1.1rem; font-weight: 800; letter-spacing: 0.5px; }
+.app-subtitle { font-size: 0.65rem; color: #94a3b8; font-weight: 500; text-transform: uppercase; }
+.btn-secondary { background-color: transparent; border: 1px solid #475569; color: #f8fafc; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+.btn-secondary:hover { background-color: #1e293b; }
+
+.admin-main-content { padding: 2rem; max-width: 1400px; margin: 0 auto; }
+.page-title-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.page-title-header h1 { margin: 0 0 0.5rem 0; font-size: 1.8rem; color: #0f172a; font-weight: 800; }
+.page-title-header p { margin: 0; color: #64748b; }
+.mb-4 { margin-bottom: 2rem; }
+.p-4 { padding: 1.5rem; }
+
+.data-matrix-section { background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+.subsection-title { margin: 0 0 1.5rem 0; font-size: 1.2rem; font-weight: 700; border-bottom: 2px solid #f1f5f9; padding-bottom: 0.75rem; }
+.text-red { color: #dc2626; }
+.text-purple { color: #8b5cf6; }
+
+.report-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+@media (min-width: 1024px) { .report-grid { grid-template-columns: 1fr 1fr; } }
+
+.risk-item { display: flex; gap: 1rem; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 1rem; background-color: #fafafa; align-items: center;}
+.risk-number { font-size: 1.5rem; font-weight: 900; color: #cbd5e1; }
+.risk-details { flex: 1; }
+.risk-question { margin: 0 0 0.5rem 0; font-weight: 600; color: #0f172a; }
+.risk-answer { margin: 0; font-size: 0.85rem; color: #475569; }
+.risk-score { font-weight: 800; color: #dc2626; background: #fef2f2; padding: 0.5rem; border-radius: 6px; }
+
+.highlight-box { background-color: #f0fdf4; border-color: #bbf7d0; }
+.commercial-text { font-size: 1.1rem; color: #166534; margin: 0; }
+.ai-box { background-color: #faf5ff; border-color: #e9d5ff; }
+.ai-content { line-height: 1.6; color: #334155; font-size: 0.95rem; }
+
+.risk-badge { padding: 0.5rem 1rem; border-radius: 8px; font-weight: 800; font-size: 1rem; }
+.risk-low { background-color: #dcfce7; color: #15803d; }
+.risk-medium { background-color: #fef9c3; color: #a16207; }
+.risk-high { background-color: #ffedd5; color: #c2410c; }
+.risk-critical { background-color: #fef2f2; color: #b91c1c; }
+.state-container { padding: 4rem; text-align: center; color: #64748b; }
+
+/* ==========================================================================
+   FORMATO DE TEXTO IA (Heredado del Cliente)
+   ========================================================================== */
+.report-section-title { font-size: 1.15rem; font-weight: 800; color: #4c1d95; margin-top: 1.5rem; margin-bottom: 0.75rem; border-bottom: 1px solid #ddd6fe; padding-bottom: 0.5rem; }
+.report-section-title:first-child { margin-top: 0; }
+.report-subsection-title { font-size: 1rem; font-weight: 700; color: #1e293b; margin-top: 1rem; margin-bottom: 0.25rem; }
+.report-paragraph { margin-bottom: 0.75rem; line-height: 1.6; }
+.report-list-container { margin: 0.5rem 0 1rem 1.5rem; padding: 0; }
+.report-list-item { margin-bottom: 0.4rem; line-height: 1.5; color: #334155; }
+.text-highlight { color: #0f172a; font-weight: 700; }

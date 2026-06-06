@@ -1,0 +1,199 @@
+<!--
+ * Contenedor raíz del módulo operativo del dashboard.
+ * Establece la estructura base de dos niveles: encabezado
+ * corporativo fijo y área de contenido principal dinámica.
+-->
+<div class="dashboard-layout">
+
+  <!--
+   * Barra de navegación superior corporativa.
+   * Presenta la identidad de la plataforma y los datos
+   * del usuario autenticado junto a las acciones de sesión.
+  -->
+  <header class="dashboard-header">
+
+    <!--
+     * Bloque de identidad visual de la marca.
+     * Agrupa el ícono institucional, el nombre del producto
+     * y el módulo operativo activo en la sesión actual.
+    -->
+    <div class="header-brand">
+      <i class="fa-solid fa-shield-halved brand-icon"></i>
+      <div class="brand-text">
+        <span class="app-title">LEXYN PULSE PRO</span>
+        <span class="app-subtitle">Módulo Operativo de Cumplimiento</span>
+      </div>
+    </div>
+
+    <!--
+     * Panel de metadatos e interacciones del usuario autenticado.
+     * Expone el nombre del cliente, la empresa asociada y
+     * el control de cierre de sesión segura.
+    -->
+    <div class="header-user-actions">
+      <div class="user-profile-meta">
+        <!-- Datos del perfil corporativo inyectados desde el componente -->
+        <span class="user-name">{{ nombreCliente }}</span>
+        <span class="user-company"><i class="fa-solid fa-building"></i> {{ empresaNombre }}</span>
+      </div>
+      <!-- Botón que invoca el método de cierre de sesión y limpieza del token JWT -->
+      <button (click)="onLogout()" class="btn-logout" title="Cerrar sesión de forma segura">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+    </div>
+
+  </header>
+
+  <!--
+   * Área de contenido principal operativo del dashboard.
+   * Contiene el banner de bienvenida y el historial
+   * de evaluaciones computadas por el sistema.
+  -->
+  <main class="dashboard-main-content">
+
+    <!--
+     * Banner de bienvenida y acceso a la acción principal de negocio.
+     * Contextualiza al usuario sobre el propósito del sistema
+     * y provee el punto de entrada para nuevas evaluaciones.
+    -->
+    <section class="welcome-action-card">
+      <div class="welcome-text-side">
+        <h1>Diagnóstico de Cumplimiento LODPD</h1>
+        <p>Evalúe el nivel de madurez de su organización frente a la Ley Orgánica de Protección de Datos Personales de Ecuador, identifique brechas críticas en tiempo real y obtenga planes de mitigación automatizados por Inteligencia Artificial.</p>
+      </div>
+      <!-- Botón principal que invoca el flujo de inicio de una nueva evaluación regulatoria -->
+      <div class="welcome-button-side">
+        <button (click)="iniciarEvaluacion()" class="btn-primary-action">
+          <i class="fa-solid fa-square-poll-horizontal"></i> Iniciar Nueva Evaluación
+        </button>
+      </div>
+    </section>
+
+    <!--
+     * Sección del historial cronológico de evaluaciones computadas.
+     * Permite al usuario monitorear la evolución de sus índices
+     * de riesgo legal y tecnológico a lo largo del tiempo.
+    -->
+    <section class="history-table-section">
+
+      <!--
+       * Encabezado descriptivo de la sección de historial.
+       * Comunica el propósito del bloque y el alcance
+       * del monitoreo disponible para el usuario.
+      -->
+      <div class="section-header-meta">
+        <h3><i class="fa-solid fa-clock-rotate-left"></i> Historial de Diagnósticos Corporativos</h3>
+        <p>Monitoreo y evolución cronológica de sus índices de riesgo legal y tecnológico</p>
+      </div>
+
+      <!--
+       * Control de estados asíncronos de la consulta a la API.
+       * Gestiona tres escenarios posibles de forma mutuamente
+       * excluyente: carga activa, error del servidor y datos listos.
+      -->
+      @if (isLoading) {
+        <!-- Indicador visual de espera durante la consulta a la base de datos centralizada -->
+        <div class="state-container">
+          <i class="fa-solid fa-circle-notch fa-spin state-icon loading"></i>
+          <p>Consultando registros en la base de datos centralizada...</p>
+        </div>
+      } @else if (errorMessage) {
+        <!-- Contenedor de error que presenta el mensaje retornado por el Backend -->
+        <div class="state-container error-state">
+          <i class="fa-solid fa-triangle-exclamation state-icon"></i>
+          <p>{{ errorMessage }}</p>
+        </div>
+      } @else {
+
+        <!--
+         * Tabla maestra interactiva con el listado de evaluaciones.
+         * Envuelta en un contenedor responsivo para adaptar
+         * su visualización a diferentes resoluciones de pantalla.
+        -->
+        <div class="table-responsive-container">
+          <table class="enterprise-data-table">
+            <thead>
+              <tr>
+                <th><i class="fa-solid fa-calendar-days"></i> Fecha de Emisión</th>
+                <th><i class="fa-solid fa-chart-simple"></i> Score Global</th>
+                <th><i class="fa-solid fa-shield-virus"></i> Nivel de Riesgo</th>
+                <th><i class="fa-solid fa-box-open"></i> Solución Recomendada</th>
+                <th class="text-center"><i class="fa-solid fa-sliders"></i> Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <!--
+               * Iteración nativa con Control Flow de Angular sobre el arreglo
+               * de evaluaciones retornado por la API. La clave única `evaluacion.id`
+               * optimiza la detección de cambios y el rendimiento del renderizado.
+              -->
+              @for (evaluacion of historialEvaluaciones; track evaluacion.id) {
+                <tr class="table-interactive-row">
+
+                  <!-- Fecha de creación del diagnóstico formateada en zona horaria local -->
+                  <td class="font-semibold">{{ evaluacion.creado_en | date:'dd/MM/yyyy - HH:mm' }}</td>
+
+                  <!--
+                   * Indicador numérico del score global de la evaluación.
+                   * Formateado con un decimal para mayor precisión visual.
+                  -->
+                  <td>
+                    <div class="score-badge-indicator">
+                      <span class="score-number">{{ evaluacion.score_final | number:'1.1-1' }}</span>
+                      <span class="score-base">/100</span>
+                    </div>
+                  </td>
+
+                  <td>
+                    <!--
+                     * Marcador dinámico de severidad legal.
+                     * Aplica la clase CSS correspondiente según el texto del nivel
+                     * de riesgo retornado por el Backend: Bajo, Medio, Alto o Crítico.
+                    -->
+                    <span class="risk-badge" [ngClass]="{
+                      'risk-low': evaluacion.nivel_riesgo === 'Bajo',
+                      'risk-medium': evaluacion.nivel_riesgo === 'Medio',
+                      'risk-high': evaluacion.nivel_riesgo === 'Alto',
+                      'risk-critical': evaluacion.nivel_riesgo === 'Crítico'
+                    }">
+                      <i class="fa-solid fa-circle font-size-xs"></i> {{ evaluacion.nivel_riesgo }}
+                    </span>
+                  </td>
+
+                  <!-- Producto o solución recomendada por el motor de IA tras el diagnóstico -->
+                  <td class="product-cell-highlight">
+                    <i class="fa-solid fa-cube"></i> {{ evaluacion.producto_recomendado }}
+                  </td>
+
+                  <!-- Botón que navega al detalle del informe ejecutivo de la evaluación seleccionada -->
+                  <td class="text-center">
+                    <button (click)="verDetalleReporte(evaluacion.id)" class="btn-table-action" title="Abrir informe ejecutivo de IA">
+                      <i class="fa-solid fa-file-invoice"></i> Ver Reporte
+                    </button>
+                  </td>
+
+                </tr>
+              } @empty {
+                <!--
+                 * Fila de estado vacío renderizada automáticamente por Angular
+                 * cuando el arreglo retornado por la API no contiene elementos.
+                -->
+                <tr>
+                  <td colspan="5" class="table-empty-fallback">
+                    <i class="fa-solid fa-folder-open empty-icon"></i>
+                    <h4>No se registran evaluaciones previas</h4>
+                    <p>Su organización aún no ha completado el diagnóstico regulatorio. Presione el botón superior para iniciar.</p>
+                  </td>
+                </tr>
+              }
+
+            </tbody>
+          </table>
+        </div>
+
+      }
+
+    </section>
+  </main>
+</div>

@@ -1,0 +1,375 @@
+/* ==========================================================================
+   ESTRUCTURA MAESTRA Y DISTRIBUCIÓN CONTENEDORA
+   ========================================================================== */
+.dashboard-layout {
+  min-height: 100vh;
+  background-color: #f8fafc; /* Gris azulado muy claro de fondo */
+  display: flex;
+  flex-direction: column;
+}
+
+/* NAVBAR SUPERIOR ELEGANTE */
+.dashboard-header {
+  background-color: #0f172a;
+  color: #ffffff;
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column; /* Mobile-First: Elementos apilados en celulares */
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-icon {
+  font-size: 1.8rem;
+  color: #3b82f6;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.app-subtitle {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.header-user-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  justify-content: space-between; /* Expansión completa en móviles */
+}
+
+.user-profile-meta {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.user-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.user-company {
+  font-size: 0.75rem;
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+.btn-logout {
+  background: none;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-logout:hover {
+  color: #ef4444;
+  border-color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
+/* CONTENEDOR CENTRAL */
+.dashboard-main-content {
+  flex: 1;
+  padding: 1.5rem;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   BANNER TARJETA DE BIENVENIDA ACCIONABLE
+   ========================================================================== */
+.welcome-action-card {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+  border-radius: 12px;
+  padding: 2rem;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 15px -3px rgba(30, 58, 138, 0.2);
+}
+
+.welcome-text-side h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin: 0 0 0.75rem 0;
+  letter-spacing: -0.5px;
+}
+
+.welcome-text-side p {
+  font-size: 0.95rem;
+  color: #bfdbfe;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.btn-primary-action {
+  background-color: #ffffff;
+  color: #1e3a8a;
+  border: none;
+  padding: 0.85rem 1.5rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+}
+
+.btn-primary-action:hover {
+  background-color: #f1f5f9;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================================================
+   SECCIÓN DE TABLA DE HISTORIAL CORPORATIVO
+   ========================================================================== */
+.history-table-section {
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.section-header-meta {
+  margin-bottom: 1.5rem;
+}
+
+.section-header-meta h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.25rem 0;
+}
+
+.section-header-meta p {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* CONTENEDOR FLUIDO RESPONSIVO */
+.table-responsive-container {
+  width: 100%;
+  overflow-x: auto; /* Desplazamiento horizontal suave exclusivo para tablas en celulares */
+  border-radius: 8px;
+  border: 1px solid #f1f5f9;
+}
+
+.enterprise-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.enterprise-data-table th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 700;
+  padding: 1rem;
+  border-bottom: 2px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.enterprise-data-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  white-space: nowrap;
+}
+
+.table-interactive-row:hover {
+  background-color: #f8fafc;
+}
+
+.font-semibold {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* ELEMENTOS DE MEDICIÓN INTERNOS (BADGES) */
+.score-badge-indicator {
+  display: inline-flex;
+  align-items: baseline;
+  background-color: #f1f5f9;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.score-number {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.score-base {
+  font-size: 0.7rem;
+  color: #64748b;
+  margin-left: 1px;
+}
+
+/* CONTROL DINÁMICO DE SEVERIDAD DE RIESGOS */
+.risk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+.risk-badge i {
+  font-size: 0.4rem;
+}
+
+.risk-low { background-color: #dcfce7; color: #15803d; }
+.risk-medium { background-color: #fef9c3; color: #a16207; }
+.risk-high { background-color: #ffedd5; color: #c2410c; }
+.risk-critical { background-color: #fef2f2; color: #b91c1c; }
+
+.product-cell-highlight {
+  font-weight: 500;
+  color: #1e3a8a;
+}
+
+.btn-table-action {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 0.45rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s;
+}
+
+.btn-table-action:hover {
+  background-color: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+}
+
+.text-center { text-align: center; }
+
+/* MANEJO DE ESTADOS DE CONTINGENCIA (VACÍOS O CARGA) */
+.state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  color: #64748b;
+  text-align: center;
+}
+
+.state-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.state-icon.loading { color: #3b82f6; }
+
+.error-state {
+  color: #ef4444;
+  background-color: #fef2f2;
+  border-radius: 8px;
+}
+
+.table-empty-fallback {
+  text-align: center !important;
+  padding: 4rem 2rem !important;
+  color: #64748b;
+}
+
+.empty-icon {
+  font-size: 2.5rem;
+  color: #cbd5e1;
+  margin-bottom: 1rem;
+}
+
+.table-empty-fallback h4 {
+  margin: 0 0 0.5rem 0;
+  color: #334155;
+  font-size: 1.1rem;
+}
+
+.table-empty-fallback p {
+  margin: 0;
+  font-size: 0.85rem;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+/* ==========================================================================
+   MEDIA QUERIES - BREAKPOINTS DE EXPANSIÓN CORPORATIVA (DISEÑO RESPONSIVO)
+   ========================================================================== */
+@media (min-width: 768px) {
+  .dashboard-header {
+    flex-direction: row; /* Cambio a layout horizontal en tablets o laptops */
+    padding: 1rem 2rem;
+  }
+
+  .header-user-actions {
+    width: auto;
+    justify-content: flex-end;
+  }
+
+  .welcome-action-card {
+    flex-direction: row; /* Fusión de dos paneles horizontales */
+    justify-content: space-between;
+    align-items: center;
+    padding: 2.5rem;
+  }
+
+  .welcome-text-side {
+    max-width: 75%;
+  }
+
+  .welcome-text-side h1 {
+    font-size: 2.2rem;
+  }
+
+  .dashboard-main-content {
+    padding: 2rem;
+  }
+}

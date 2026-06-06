@@ -1,0 +1,188 @@
+<!--
+ * Contenedor raíz del módulo de evaluación regulatoria.
+ * Estructura el layout en dos niveles: encabezado de
+ * navegación del cuestionario y área de formulario activo.
+-->
+<div class="evaluacion-layout">
+
+  <!--
+   * Encabezado de navegación del cuestionario de diagnóstico.
+   * Provee el control de retorno al panel principal y presenta
+   * el contexto normativo de la evaluación en curso.
+  -->
+  <header class="evaluacion-header">
+    <div class="header-container">
+
+      <!-- Botón que invoca la cancelación del proceso y retorna al panel principal -->
+      <button (click)="cancelarEvaluacion()" class="btn-back-link" title="Regresar al menú principal">
+        <i class="fa-solid fa-arrow-left"></i> Volver al Panel
+      </button>
+
+      <!--
+       * Bloque de título que identifica el cuestionario activo
+       * y el marco normativo bajo el cual se ejecuta la evaluación.
+      -->
+      <div class="header-title-block">
+        <h2>Cuestionario de Diagnóstico Técnico-Legal</h2>
+        <p><i class="fa-solid fa-scale-balanced"></i> Evaluación de cumplimiento en base a las normativas de la LODPD</p>
+      </div>
+
+    </div>
+  </header>
+
+  <!--
+   * Área principal de contenido del formulario de evaluación.
+   * Gestiona los estados asíncronos de carga y error, y renderiza
+   * el cuestionario dinámico cuando los datos están disponibles.
+  -->
+  <main class="evaluacion-main-container">
+
+    <!--
+     * Control de estados asíncronos de la consulta a la API.
+     * Gestiona tres escenarios de forma mutuamente excluyente:
+     * carga activa, error del servidor y cuestionario listo.
+    -->
+    @if (isLoading) {
+      <!-- Indicador visual de espera durante la inyección del catálogo de preguntas -->
+      <div class="loading-state-box">
+        <i class="fa-solid fa-circle-notch fa-spin spinner-icon"></i>
+        <p>Inyectando catálogo dinámico de preguntas normativas...</p>
+      </div>
+    } @else if (errorMessage) {
+      <!-- Contenedor de error accesible que presenta el incidente retornado por el Backend -->
+      <div class="error-alert-box" role="alert">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <p><strong>Incidente Operativo:</strong> {{ errorMessage }}</p>
+      </div>
+    } @else {
+
+      <!--
+       * Tarjeta de instrucciones generales del cuestionario.
+       * Orienta al usuario sobre el propósito de sus respuestas
+       * y el proceso de análisis ejecutado por los motores de IA.
+      -->
+      <div class="form-instructions-card">
+        <h3><i class="fa-solid fa-circle-info"></i> Instrucciones Generales</h3>
+        <p>Responda con total transparencia cada una de las siguientes preguntas. Las respuestas ingresadas serán procesadas de forma matemática por nuestros motores financieros y analizadas de forma contextual por Inteligencia Artificial para estructurar sus planes de mitigación inmediata.</p>
+      </div>
+
+      <!--
+       * Contenedor de iteración del listado de preguntas normativas.
+       * Renderiza dinámicamente cada tarjeta de pregunta usando el
+       * Control Flow nativo de Angular con clave única de rastreo.
+      -->
+      <div class="questions-list-wrapper">
+        @for (pregunta of preguntas; track pregunta.id) {
+
+          <!--
+           * Tarjeta individual de pregunta del cuestionario.
+           * La clase `question-answered` se activa dinámicamente
+           * cuando el usuario ha seleccionado una opción de respuesta.
+          -->
+          <div class="question-card" [class.question-answered]="respuestasSeleccionadas[pregunta.id]">
+
+            <!--
+             * Encabezado de la tarjeta que muestra el número secuencial
+             * del ítem y la categoría normativa a la que pertenece.
+            -->
+            <div class="question-card-header">
+              <!-- Índice visual del ítem calculado desde el iterador nativo de Angular -->
+              <span class="question-index-badge">Ítem {{ $index + 1 }}</span>
+              <span class="question-category-tag"><i class="fa-solid fa-tags"></i> {{ pregunta.tipo_categoria }}</span>
+            </div>
+
+            <!-- Texto completo de la pregunta normativa retornada por la API -->
+            <h4 class="question-text">{{ pregunta.texto_pregunta }}</h4>
+
+            <!--
+             * Grilla de opciones de respuesta para la pregunta activa.
+             * Itera sobre el arreglo de opciones y renderiza cada una
+             * como un control radio accesible con estilos personalizados.
+            -->
+            <div class="options-grid-container">
+              @for (opcion of pregunta.opciones; track opcion.id) {
+
+                <!--
+                 * Etiqueta interactiva que envuelve el control radio nativo.
+                 * La clase `label-selected` se aplica cuando la opción
+                 * coincide con la respuesta almacenada para esta pregunta.
+                -->
+                <label
+                  class="option-interactive-label"
+                  [class.label-selected]="respuestasSeleccionadas[pregunta.id] === opcion.id"
+                >
+                  <!--
+                   * Control radio nativo oculto visualmente.
+                   * El evento (change) registra la opción seleccionada
+                   * en el mapa de respuestas del componente.
+                  -->
+                  <input
+                    type="radio"
+                    [name]="'pregunta_' + pregunta.id"
+                    [value]="opcion.id"
+                    (change)="seleccionarOpcion(pregunta.id, opcion.id)"
+                    [checked]="respuestasSeleccionadas[pregunta.id] === opcion.id"
+                    class="native-radio-control"
+                  />
+                  <!-- Indicador visual personalizado que muestra el literal de la opción -->
+                  <span class="custom-radio-circle">{{ opcion.literal }}</span>
+                  <!-- Texto descriptivo de la opción de respuesta -->
+                  <span class="option-text-content">{{ opcion.texto_opcion }}</span>
+                </label>
+
+              }
+            </div>
+
+          </div>
+        }
+      </div>
+
+      <!--
+       * Barra de control inferior fija del proceso de evaluación.
+       * Muestra el progreso actual del cuestionario y provee los
+       * controles de cancelación y envío transaccional al servidor.
+      -->
+      <footer class="evaluation-action-bar">
+
+        <!--
+         * Indicador de progreso que compara las respuestas registradas
+         * contra el total de preguntas requeridas por el cuestionario.
+        -->
+        <div class="progress-info-text">
+          <i class="fa-solid fa-list-check"></i>
+          Progreso actual: <strong>{{ Object.keys(respuestasSeleccionadas).length }}</strong> de <strong>{{ preguntas.length }}</strong> requeridas.
+        </div>
+
+        <div class="action-buttons-group">
+
+          <!-- Botón de cancelación deshabilitado mientras se procesa el envío al Backend -->
+          <button (click)="cancelarEvaluacion()" [disabled]="isSubmitting" class="btn-secondary-cancel">
+            <i class="fa-solid fa-ban"></i> Cancelar Proceso
+          </button>
+
+          <!--
+           * Botón de envío transaccional del cuestionario completado.
+           * Permanece deshabilitado hasta que todas las preguntas
+           * hayan sido respondidas o exista un envío activo en curso.
+          -->
+          <button
+            (click)="enviarEvaluacion()"
+            [disabled]="!cuestionarioCompleto() || isSubmitting"
+            class="btn-primary-submit"
+          >
+            <!-- Indicador de proceso activo durante el cómputo del reporte ejecutivo -->
+            @if (isSubmitting) {
+              <span><i class="fa-solid fa-circle-notch fa-spin"></i> Computando Reporte Ejecutivo...</span>
+            } @else {
+              <!-- Estado estático del botón cuando no hay operaciones de envío en curso -->
+              <span><i class="fa-solid fa-paper-plane"></i> Finalizar y Procesar Evaluación</span>
+            }
+          </button>
+
+        </div>
+      </footer>
+
+    }
+
+  </main>
+</div>

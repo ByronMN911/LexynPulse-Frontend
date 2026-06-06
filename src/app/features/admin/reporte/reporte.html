@@ -1,0 +1,67 @@
+<div class="admin-layout">
+  <header class="admin-header">
+    <div class="brand-zone">
+      <i class="fa-solid fa-shield-halved brand-icon"></i>
+      <div class="brand-text">
+        <span class="app-title">LEXYN PULSE PRO</span>
+        <span class="app-subtitle">Auditoría de Reporte Específico</span>
+      </div>
+    </div>
+    <div class="user-zone">
+      <button class="btn-secondary" (click)="volverAlDashboard()"><i class="fa-solid fa-arrow-left"></i> Volver a la Matriz</button>
+    </div>
+  </header>
+
+  <main class="admin-main-content">
+    @if (isLoading) {
+      <div class="state-container"><i class="fa-solid fa-circle-notch fa-spin state-icon loading"></i><p>Extrayendo análisis de Inteligencia Artificial...</p></div>
+    } @else if (errorMessage) {
+      <div class="state-container error-state"><i class="fa-solid fa-triangle-exclamation state-icon"></i><p>{{ errorMessage }}</p></div>
+    } @else if (reporte) {
+      
+      <div class="page-title-header mb-4">
+        <div>
+          <h1>Análisis de Riesgo: {{ reporte.cabecera.usuario_empresa_nombre || 'Organización' }}</h1>
+          <p>Evaluación emitida el {{ reporte.cabecera.creado_en | date:'dd/MM/yyyy HH:mm' }}</p>
+        </div>
+        <div class="risk-badge" [ngClass]="{'risk-low': reporte.cabecera.nivel_riesgo === 'Bajo', 'risk-medium': reporte.cabecera.nivel_riesgo === 'Medio', 'risk-high': reporte.cabecera.nivel_riesgo === 'Alto', 'risk-critical': reporte.cabecera.nivel_riesgo === 'Crítico'}">
+          RIESGO {{ reporte.cabecera.nivel_riesgo | uppercase }} (Score: {{ reporte.cabecera.score_final }})
+        </div>
+      </div>
+
+      <div class="report-grid">
+        <div class="report-column">
+          <div class="data-matrix-section p-4">
+            <h3 class="subsection-title text-red"><i class="fa-solid fa-fire-flame-curved"></i> Top 3 Riesgos Críticos Detectados</h3>
+            <div class="risk-list">
+              @for (riesgo of reporte.top3Riesgos; track riesgo.id; let i = $index) {
+                <div class="risk-item">
+                  <span class="risk-number">#{{ i + 1 }}</span>
+                  <div class="risk-details">
+                    <p class="risk-question">{{ riesgo.texto_pregunta }}</p>
+                    <p class="risk-answer"><strong>Fallo detectado:</strong> {{ riesgo.texto_opcion }}</p>
+                  </div>
+                  <span class="risk-score font-mono">{{ riesgo.puntaje_riesgo_momento }} pts</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="report-column">
+          <div class="data-matrix-section p-4 mb-4 highlight-box">
+            <h3 class="subsection-title"><i class="fa-solid fa-lightbulb"></i> Recomendación Comercial (Pricing)</h3>
+            <p class="commercial-text">Sugerencia del motor de reglas: <strong>{{ reporte.cabecera.producto_recomendado }}</strong></p>
+          </div>
+
+          <div class="data-matrix-section p-4 ai-box">
+            <h3 class="subsection-title text-purple"><i class="fa-solid fa-robot"></i> Dictamen de Gemini 2.5 Pro</h3>
+            
+            <div class="ai-content format-text" [innerHTML]="htmlInformeIA"></div>
+            
+          </div>
+        </div>
+      </div>
+    }
+  </main>
+</div>

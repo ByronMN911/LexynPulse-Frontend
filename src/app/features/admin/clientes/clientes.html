@@ -1,0 +1,350 @@
+<!--
+ * Contenedor raíz del módulo de gestión de clientes corporativos.
+ * Estructura el layout administrativo incluyendo el sistema de
+ * notificaciones toast, el encabezado y el área de contenido principal.
+-->
+<div class="admin-layout">
+
+  <!--
+   * Sistema de notificaciones toast de retroalimentación operativa.
+   * Se renderiza únicamente cuando `toastData.show` es verdadero.
+   * Aplica estilos diferenciados según el tipo: error o éxito.
+  -->
+  @if (toastData.show) {
+    <div class="toast-notification" [ngClass]="toastData.type === 'error' ? 'toast-error' : 'toast-success'">
+      <!-- Ícono dinámico que refleja visualmente el tipo de notificación activa -->
+      <i class="fa-solid" [ngClass]="toastData.type === 'error' ? 'fa-circle-xmark' : 'fa-circle-check'"></i>
+      <span>{{ toastData.message }}</span>
+    </div>
+  }
+
+  <!--
+   * Encabezado de navegación del panel administrativo.
+   * Concentra la identidad de la plataforma, los accesos
+   * a los módulos del sistema y los datos del administrador activo.
+  -->
+  <header class="admin-header">
+
+    <!--
+     * Bloque de identidad visual de la marca.
+     * Presenta el ícono institucional, el nombre del producto
+     * y el módulo operativo activo en la sesión administrativa.
+    -->
+    <div class="brand-zone">
+      <i class="fa-solid fa-shield-halved brand-icon"></i>
+      <div class="brand-text">
+        <span class="app-title">LEXYN PULSE PRO</span>
+        <span class="app-subtitle">Matriz de Telemetría Global</span>
+      </div>
+    </div>
+
+    <!--
+     * Barra de navegación entre módulos administrativos del sistema.
+     * El ítem activo refleja el módulo en uso mediante la clase `active`.
+     * Los botones inactivos invocan métodos de enrutamiento del componente.
+    -->
+    <nav class="admin-nav-links">
+      <!-- Botón que navega al módulo de telemetría y métricas del dashboard -->
+      <button class="nav-item" (click)="irADashboard()"><i class="fa-solid fa-chart-line"></i> Dashboard</button>
+      <button class="nav-item active"><i class="fa-solid fa-users-gear"></i> Clientes</button>
+      <!-- Botón que navega al módulo de administración del cuestionario normativo -->
+      <button class="nav-item" (click)="irAGestionPreguntas()"><i class="fa-solid fa-list-check"></i> Cuestionario</button>
+    </nav>
+
+    <!--
+     * Panel de metadatos e interacciones del administrador autenticado.
+     * Expone el nombre del administrador, su rol institucional y
+     * el control de cierre de sesión segura del sistema.
+    -->
+    <div class="user-zone">
+      <div class="user-meta">
+        <!-- Datos del perfil administrativo inyectados desde el componente -->
+        <span class="user-name">{{ nombreAdmin }}</span>
+        <span class="user-role"><i class="fa-solid fa-user-shield"></i> Administrador Core</span>
+      </div>
+      <!-- Botón que invoca el método de cierre de sesión y limpieza del token JWT -->
+      <button (click)="cerrarSesion()" class="btn-logout" title="Cerrar Sesión Segura">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+    </div>
+
+  </header>
+
+  <!--
+   * Área principal de contenido del módulo de gestión de clientes.
+   * Contiene el encabezado de página, la acción de registro
+   * y la tabla maestra del directorio corporativo.
+  -->
+  <main class="admin-main-content">
+
+    <!--
+     * Encabezado de página con título descriptivo del módulo y
+     * botón de acceso rápido para el registro de nuevos clientes.
+    -->
+    <div class="page-title-header">
+      <div>
+        <h1><i class="fa-solid fa-building-user"></i> Gestión de Cuentas Corporativas</h1>
+        <p>Directorio de empresas, representantes legales y control de accesos al sistema</p>
+      </div>
+      <!-- Botón que abre el modal de creación de un nuevo registro de cliente -->
+      <button class="btn-primary" (click)="abrirModalCrear()">
+        <i class="fa-solid fa-user-plus"></i> Registrar Nuevo Cliente
+      </button>
+    </div>
+
+    <!--
+     * Sección de la matriz de datos del directorio de clientes corporativos.
+     * Gestiona los estados asíncronos y renderiza la tabla
+     * interactiva cuando los datos están disponibles.
+    -->
+    <section class="data-matrix-section">
+
+      <!--
+       * Control de estados asíncronos de la consulta a la API.
+       * Gestiona tres escenarios de forma mutuamente excluyente:
+       * carga activa, error del servidor y directorio listo.
+      -->
+      @if (isLoading) {
+        <!-- Indicador visual de espera durante la consulta a la base de datos de usuarios -->
+        <div class="state-container">
+          <i class="fa-solid fa-circle-notch fa-spin state-icon loading"></i>
+          <p>Consultando base de datos de usuarios...</p>
+        </div>
+      } @else if (errorMessage) {
+        <!-- Contenedor de error que presenta el mensaje retornado por el Backend -->
+        <div class="state-container error-state">
+          <i class="fa-solid fa-triangle-exclamation state-icon"></i>
+          <p>{{ errorMessage }}</p>
+        </div>
+      } @else {
+
+        <!--
+         * Tabla maestra del directorio de clientes envuelta en contenedor responsivo.
+         * Presenta datos de organización, representante legal, acceso al sistema
+         * y acciones de gestión por cada cuenta corporativa registrada.
+        -->
+        <div class="table-responsive-wrapper">
+          <table class="admin-data-table">
+            <thead>
+              <tr>
+                <th><i class="fa-regular fa-calendar"></i> Fecha Alta</th>
+                <th><i class="fa-regular fa-building"></i> Organización</th>
+                <th><i class="fa-solid fa-user-tie"></i> Representante Legal</th>
+                <th><i class="fa-solid fa-at"></i> Correo Electrónico</th>
+                <th class="text-center"><i class="fa-solid fa-power-off"></i> Acceso al Sistema</th>
+                <th class="text-center"><i class="fa-solid fa-sliders"></i> Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <!--
+               * Iteración nativa con Control Flow de Angular sobre el arreglo
+               * de clientes retornado por la API. La clase `row-suspended` se aplica
+               * visualmente a las cuentas con acceso deshabilitado al sistema.
+              -->
+              @for (cliente of clientes; track cliente.id) {
+                <tr class="table-row-hover" [class.row-suspended]="!cliente.activo">
+
+                  <!-- Fecha de registro del cliente formateada en zona horaria local -->
+                  <td class="font-mono text-sm text-gray">{{ cliente.creado_en | date:'dd/MM/yyyy' }}</td>
+
+                  <!--
+                   * Celda de organización que presenta la razón social de la empresa
+                   * y el sector económico junto al tamaño operativo registrado.
+                  -->
+                  <td>
+                    <span class="font-bold text-dark">{{ cliente.empresa_nombre }}</span><br/>
+                    <span class="text-xs text-gray"><i class="fa-solid fa-briefcase"></i> {{ cliente.empresa_sector }} ({{ cliente.empresa_tamano }})</span>
+                  </td>
+
+                  <!-- Nombre completo del representante legal de la cuenta corporativa -->
+                  <td class="font-bold text-blue">{{ cliente.nombre_completo }}</td>
+
+                  <!-- Correo electrónico de acceso al sistema del representante registrado -->
+                  <td class="text-gray">{{ cliente.correo }}</td>
+
+                  <!--
+                   * Celda de control de acceso al sistema mediante toggle switch.
+                   * El switch invoca `conmutarEstadoAcceso()` al cambiar su estado
+                   * y se deshabilita mientras la operación asíncrona está en curso.
+                  -->
+                  <td class="text-center">
+                    <label class="switch-container">
+                      <input
+                        type="checkbox"
+                        [checked]="cliente.activo"
+                        (change)="conmutarEstadoAcesso(cliente)"
+                        [disabled]="isToggling[cliente.id]"
+                        class="switch-input"
+                      >
+                      <span class="switch-slider"></span>
+                    </label>
+                    <div class="switch-label">
+                      <!--
+                       * Indicador de estado del toggle con dos variantes visuales.
+                       * Muestra spinner durante la actualización asíncrona y el
+                       * estado textual de la cuenta cuando la operación finaliza.
+                      -->
+                      @if (isToggling[cliente.id]) {
+                        <!-- Estado de carga durante la conmutación del acceso en el Backend -->
+                        <span class="text-xs text-gray"><i class="fa-solid fa-spinner fa-spin"></i> Actualizando...</span>
+                      } @else {
+                        <!-- Estado final de la cuenta con color diferenciado por condición -->
+                        <span class="text-xs font-bold" [ngClass]="cliente.activo ? 'text-green' : 'text-red'">
+                          {{ cliente.activo ? 'CUENTA ACTIVA' : 'SUSPENDIDO' }}
+                        </span>
+                      }
+                    </div>
+                  </td>
+
+                  <!-- Botón que abre el modal de edición con los datos precargados del cliente -->
+                  <td class="text-center">
+                    <button class="btn-action-edit" (click)="abrirModalEditar(cliente)" title="Editar Información">
+                      <i class="fa-solid fa-pen-to-square"></i> Editar
+                    </button>
+                  </td>
+
+                </tr>
+              } @empty {
+                <!--
+                 * Fila de estado vacío renderizada automáticamente por Angular
+                 * cuando el arreglo de clientes retornado por la API está vacío.
+                -->
+                <tr>
+                  <td colspan="6" class="empty-table-state">
+                    <i class="fa-solid fa-users-slash"></i>
+                    <p>No existen clientes registrados en la plataforma.</p>
+                  </td>
+                </tr>
+              }
+
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+
+  </main>
+
+  <!--
+   * Modal de gestión de clientes corporativos.
+   * Se renderiza únicamente cuando `isModalOpen` es verdadero.
+   * Opera en dos modos funcionales controlados por `modalMode`:
+   * CREAR para nuevos registros y EDITAR para actualizaciones.
+  -->
+  @if (isModalOpen) {
+    <div class="modal-backdrop">
+      <div class="modal-card">
+
+        <!--
+         * Encabezado del modal con título dinámico según el modo activo.
+         * El botón de cierre invoca `cerrarModal()` para desmontar el modal
+         * y limpiar el estado del formulario reactivo del componente.
+        -->
+        <div class="modal-header">
+          <h2>{{ modalMode === 'CREAR' ? 'Registrar Nuevo Cliente' : 'Actualizar Cliente Corporativo' }}</h2>
+          <button class="btn-close-modal" (click)="cerrarModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <!--
+         * Formulario reactivo de gestión del cliente corporativo.
+         * Enlazado con `clienteForm` del componente y delegando
+         * el guardado transaccional al método `guardarCliente()`.
+        -->
+        <form [formGroup]="clienteForm" (ngSubmit)="guardarCliente()" class="modal-body" autocomplete="off">
+
+          <!--
+           * Grilla de campos del formulario de registro y edición.
+           * Captura los datos personales, de acceso y de la organización
+           * del representante legal de la cuenta corporativa.
+          -->
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label>Representante Legal</label>
+              <input type="text" formControlName="nombre_completo" placeholder="Ej. Juan Pérez" [class.field-error]="clienteForm.get('nombre_completo')?.touched && clienteForm.get('nombre_completo')?.invalid">
+              @if (clienteForm.get('nombre_completo')?.touched && clienteForm.get('nombre_completo')?.invalid) { 
+                <small class="text-error">El nombre completo es un campo obligatorio.</small> 
+              }
+            </div>
+
+            <div class="form-group">
+              <label>Correo Electrónico de Acceso</label>
+              <input type="email" formControlName="correo" placeholder="ejemplo@empresa.com" autocomplete="off" [class.field-error]="clienteForm.get('correo')?.touched && clienteForm.get('correo')?.invalid">
+              @if (clienteForm.get('correo')?.touched && clienteForm.get('correo')?.hasError('required')) { 
+                <small class="text-error">El correo electrónico es obligatorio.</small> 
+              } @else if (clienteForm.get('correo')?.touched && clienteForm.get('correo')?.hasError('email')) {
+                <small class="text-error">Debe ingresar un formato de correo válido.</small>
+              }
+            </div>
+
+            <div class="form-group">
+              <label>Contraseña de Seguridad</label>
+              <input type="password" formControlName="password" autocomplete="new-password" [placeholder]="modalMode === 'EDITAR' ? 'Dejar en blanco para conservar' : 'Mínimo 6 caracteres con símbolos'" [class.field-error]="clienteForm.get('password')?.touched && clienteForm.get('password')?.invalid">
+              
+              @if (clienteForm.get('password')?.touched && clienteForm.get('password')?.hasError('required')) { 
+                <small class="text-error">La contraseña es obligatoria para nuevos registros.</small> 
+              } @else if (clienteForm.get('password')?.touched && clienteForm.get('password')?.hasError('pattern')) {
+                <small class="text-error">Debe incluir minúscula, mayúscula, número y un símbolo (Mín. 6 caracteres).</small>
+              }
+            </div>
+
+            <div class="form-group">
+              <label>Razón Social (Empresa)</label>
+              <input type="text" formControlName="empresa_nombre" placeholder="Ej. Consultora S.A." [class.field-error]="clienteForm.get('empresa_nombre')?.touched && clienteForm.get('empresa_nombre')?.invalid">
+              @if (clienteForm.get('empresa_nombre')?.touched && clienteForm.get('empresa_nombre')?.invalid) { 
+                <small class="text-error">El nombre de la empresa es obligatorio.</small> 
+              }
+            </div>
+
+            <div class="form-group">
+              <label>Tamaño Operativo</label>
+              <select formControlName="empresa_tamano" [class.field-error]="clienteForm.get('empresa_tamano')?.touched && clienteForm.get('empresa_tamano')?.invalid">
+                <option value="">Seleccione el volumen...</option>
+                <option value="Micro (1-10)">Micro (1-10 empleados)</option>
+                <option value="Pequeña (11-50)">Pequeña (11-50 empleados)</option>
+                <option value="Mediana (51-200)">Mediana (51-200 empleados)</option>
+                <option value="Grande (+200)">Grande (+200 empleados)</option>
+              </select>
+              @if (clienteForm.get('empresa_tamano')?.touched && clienteForm.get('empresa_tamano')?.invalid) { 
+                <small class="text-error">Debe seleccionar el tamaño de la organización.</small> 
+              }
+            </div>
+
+            <div class="form-group">
+              <label>Sector de la Industria</label>
+              <select formControlName="empresa_sector" [class.field-error]="clienteForm.get('empresa_sector')?.touched && clienteForm.get('empresa_sector')?.invalid">
+                <option value="">Seleccione el giro de negocio...</option>
+                <option value="General">General / Otros</option>
+                <option value="E-commerce">E-commerce</option>
+                <option value="Educación">Educación</option>
+                <option value="Salud">Salud</option>
+              </select>
+              @if (clienteForm.get('empresa_sector')?.touched && clienteForm.get('empresa_sector')?.invalid) { 
+                <small class="text-error">Debe asignar el sector corporativo.</small> 
+              }
+            </div>
+
+          </div>
+
+          <!--
+           * Pie del modal con controles de cancelación y guardado.
+           * El botón de envío permanece deshabilitado mientras el formulario
+           * contenga errores de validación o exista una operación de guardado activa.
+          -->
+          <div class="modal-footer">
+            <!-- Botón de cancelación deshabilitado mientras se procesa el guardado en el Backend -->
+            <button type="button" class="btn-secondary" (click)="cerrarModal()" [disabled]="isSaving">Cancelar</button>
+            <button type="submit" class="btn-primary" [disabled]="clienteForm.invalid || isSaving">
+              <!-- Indicador de proceso activo durante el guardado transaccional del registro -->
+              @if (isSaving) { <i class="fa-solid fa-spinner fa-spin"></i> Guardando... }
+              @else { <i class="fa-solid fa-floppy-disk"></i> Guardar Registro }
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  }
+
+</div>

@@ -1,0 +1,226 @@
+<!--
+ * Contenedor raíz del módulo de reporte ejecutivo.
+ * Estructura el layout en dos niveles: encabezado de
+ * navegación y área de contenido del informe generado.
+-->
+<div class="reporte-layout">
+
+  <!--
+   * Encabezado de navegación del módulo de reporte.
+   * Provee el control de retorno al panel principal y
+   * la acción de exportación del informe en formato PDF.
+  -->
+  <header class="reporte-header">
+    <div class="header-wrapper">
+
+      <!-- Botón que invoca el retorno inmediato al panel principal del dashboard -->
+      <button (click)="regresarAlPanel()" class="btn-nav-back">
+        <i class="fa-solid fa-chevron-left"></i> Panel Principal
+      </button>
+
+      <!--
+       * Grupo de acciones del encabezado.
+       * El botón de descarga permanece deshabilitado mientras
+       * el reporte esté cargando o exista un error de consulta.
+      -->
+      <div class="header-actions">
+        <button (click)="descargarPdf()" [disabled]="isLoading || errorMessage" class="btn-download-pdf">
+          <i class="fa-solid fa-file-pdf"></i> Exportar Reporte Corporativo (PDF)
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!--
+   * Área principal de contenido del reporte ejecutivo.
+   * Gestiona los estados asíncronos de carga y error, y renderiza
+   * las secciones del informe cuando los datos están disponibles.
+  -->
+  <main class="reporte-main-container" id="reporte-pdf-content">
+
+    <!--
+     * Control de estados asíncronos de la consulta a la API.
+     * Gestiona tres escenarios de forma mutuamente excluyente:
+     * carga activa, error del servidor y reporte listo.
+    -->
+    @if (isLoading) {
+      <!-- Indicador visual de espera durante la extracción y estructuración del informe -->
+      <div class="report-state-box">
+        <i class="fa-solid fa-circle-notch fa-spin state-icon loading"></i>
+        <p>Extrayendo auditoría y estructurando informe normativo de IA...</p>
+      </div>
+    } @else if (errorMessage) {
+      <!--
+       * Contenedor de error con opción de recuperación.
+       * Presenta el incidente retornado por el Backend y provee
+       * un control de retorno al dashboard para reintentar.
+      -->
+      <div class="report-state-box error-box">
+        <i class="fa-solid fa-triangle-exclamation state-icon"></i>
+        <p><strong>Incidente de Consulta:</strong> {{ errorMessage }}</p>
+        <!-- Botón de retorno al dashboard disponible únicamente en estado de error -->
+        <button (click)="regresarAlPanel()" class="btn-error-retry">Volver al Dashboard</button>
+      </div>
+    } @else {
+
+      <!--
+       * Sección de resumen ejecutivo del índice de cumplimiento.
+       * Presenta el nivel de riesgo detectado y la solución
+       * tecnológica recomendada por el motor de análisis.
+      -->
+      <section class="results-overview-card">
+
+        <!--
+         * Bloque de encabezado de la sección de resultados.
+         * Identifica el marco normativo evaluado y contextualiza
+         * el origen automatizado del análisis presentado.
+        -->
+        <div class="overview-header-block">
+          <span class="badge-compliance"><i class="fa-solid fa-gavel"></i> LEY ORGÁNICA DE PROTECCIÓN DE DATOS</span>
+          <h2>Índice General de Cumplimiento</h2>
+          <p>Resultados del análisis automatizado del perfil de riesgo de la organización</p>
+        </div>
+
+        <!--
+         * Grilla de métricas analíticas principales del reporte.
+         * Concentra el nivel de riesgo detectado y la recomendación
+         * de solución tecnológica en dos bloques diferenciados.
+        -->
+        <div class="overview-analytics-grid">
+
+          <!--
+           * Indicador de nivel de riesgo legal de la organización.
+           * La comparación se ejecuta en minúsculas mediante lowercase()
+           * para garantizar coincidencia independiente del formato del Backend.
+           * Soporta variantes con y sin tilde para el valor 'Crítico'.
+          -->
+          <div class="analytics-metric-box">
+            <span class="metric-label">Nivel de Riesgo Detectado</span>
+            <div class="risk-status-badge" [ngClass]="{
+              'risk-low': cabecera?.nivel_riesgo?.toLowerCase() === 'bajo',
+              'risk-medium': cabecera?.nivel_riesgo?.toLowerCase() === 'medio',
+              'risk-high': cabecera?.nivel_riesgo?.toLowerCase() === 'alto',
+              'risk-critical': cabecera?.nivel_riesgo?.toLowerCase() === 'crítico' || cabecera?.nivel_riesgo?.toLowerCase() === 'critico'
+            }">
+              <i class="fa-solid fa-triangle-exclamation"></i> {{ cabecera?.nivel_riesgo | uppercase }}
+            </div>
+          </div>
+
+          <!--
+           * Bloque de solución tecnológica recomendada por el sistema.
+           * Presenta el producto Suite Lexyn sugerido y un mensaje
+           * comercial contextualizado según las brechas identificadas.
+          -->
+          <div class="analytics-solution-box">
+            <span class="metric-label">Solución Tecnológica Recomendada</span>
+            <!-- Nombre del producto retornado directamente desde la cabecera del reporte -->
+            <h4>Suite Lexyn {{ cabecera?.producto_recomendado }}</h4>
+            <p class="commercial-message">
+              En base a las brechas identificadas, la organización requiere la implementación estratégica de este módulo tecnológico para blindar las operaciones operativas, formalizar las políticas ante la autoridad de control y automatizar el cumplimiento normativo.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <!--
+       * Sección de brechas críticas prioritarias de la evaluación.
+       * Presenta las tres vulnerabilidades operativas con mayor
+       * peligro legal y sancionatorio identificadas por el sistema.
+      -->
+      <section class="critical-breaches-section">
+
+        <!--
+         * Encabezado descriptivo de la sección de brechas críticas.
+         * Comunica el criterio de priorización aplicado para
+         * la selección de los riesgos presentados al usuario.
+        -->
+        <div class="section-title-meta">
+          <h3><i class="fa-solid fa-circle-nodes"></i> Brechas Críticas Prioritarias</h3>
+          <p>Las 3 vulnerabilidades operativas que representan el mayor peligro legal y sancionatorio inmediato</p>
+        </div>
+
+        <!--
+         * Listado vertical de tarjetas de brecha crítica.
+         * Itera sobre el arreglo top3Riesgos usando el Control Flow
+         * nativo de Angular con clave única de rastreo por pregunta.
+        -->
+        <div class="breaches-vertical-list">
+          @for (riesgo of top3Riesgos; track riesgo.pregunta_id) {
+
+            <!--
+             * Tarjeta individual de brecha crítica detectada.
+             * Presenta el índice secuencial, la categoría normativa,
+             * la severidad normalizada, el enunciado y la situación actual.
+            -->
+            <div class="breach-alert-card">
+
+              <!-- Índice numérico visual del riesgo dentro del ranking de los tres principales -->
+              <div class="breach-card-index">0{{ $index + 1 }}</div>
+
+              <div class="breach-card-body">
+
+                <!--
+                 * Fila de metadatos de la brecha.
+                 * Muestra la categoría normativa afectada y el puntaje
+                 * de severidad ya normalizado retornado por el Backend.
+                -->
+                <div class="breach-meta-row">
+                  <span class="breach-category"><i class="fa-solid fa-folder-shield"></i> {{ riesgo.tipo_categoria }}</span>
+                  <span class="breach-score-tag">Severidad: {{ riesgo.severidad_normalizada }}.0/10</span>
+                </div>
+
+                <!-- Texto de la pregunta normativa asociada a la brecha detectada -->
+                <h4 class="breach-question-text">{{ riesgo.texto_pregunta }}</h4>
+
+                <!-- Situación actual de la empresa según la opción de respuesta seleccionada -->
+                <div class="breach-current-situation">
+                  <strong>Situación de la Empresa:</strong>
+                  <p>{{ riesgo.texto_opcion }}</p>
+                </div>
+
+              </div>
+            </div>
+          }
+        </div>
+
+      </section>
+
+      <!--
+       * Sección del informe ejecutivo generado por Inteligencia Artificial.
+       * Presenta la auditoría legal completa y el plan de acción estructurado
+       * por el ecosistema Gemini Pro en formato HTML renderizado.
+      -->
+      <section class="ai-report-markdown-section">
+
+        <!--
+         * Encabezado de la sección del informe de IA.
+         * Identifica el tipo de análisis, su propósito ejecutivo
+         * y el modelo de inteligencia artificial utilizado.
+        -->
+        <div class="ai-section-header">
+          <div class="ai-title-block">
+            <i class="fa-solid fa-brain ai-icon"></i>
+            <div>
+              <h3>Informe de Orientación Ejecutivo</h3>
+              <p>Auditoría legal y plan de acción de bajo costo operativo estructurado por Inteligencia Artificial</p>
+            </div>
+          </div>
+          <!-- Badge que identifica el modelo de IA utilizado para generar el informe -->
+          <span class="badge-ai-model">GEMINI PRO ECOSYSTEM</span>
+        </div>
+
+        <!--
+         * Contenedor de renderizado del informe generado por IA.
+         * El contenido HTML es inyectado de forma segura mediante
+         * la propiedad htmlInformeIA procesada desde el componente.
+        -->
+        <div [innerHTML]="htmlInformeIA" class="markdown-html-content"></div>
+
+      </section>
+
+    }
+
+  </main>
+</div>

@@ -1,0 +1,180 @@
+<!--
+ * Contenedor raíz del módulo de autenticación.
+ * Provee el layout base para centrar y estructurar
+ * visualmente el panel de acceso en pantalla completa.
+-->
+<div class="login-container">
+
+  <!--
+   * Wrapper principal que divide el panel de autenticación
+   * en dos columnas: la franja de marca y el formulario de acceso.
+  -->
+  <div class="login-wrapper">
+
+    <!--
+     * Panel izquierdo de identidad corporativa.
+     * Presenta la marca, el propósito del sistema y el
+     * marco normativo aplicable de forma visualmente destacada.
+    -->
+    <div class="login-brand-side">
+
+      <!-- Capa de overlay aplicada sobre el fondo del panel de marca -->
+      <div class="brand-overlay"></div>
+
+      <!--
+       * Contenido central del panel de marca.
+       * Agrupa el ícono institucional, el nombre del producto,
+       * el tagline descriptivo y la información de conformidad legal.
+      -->
+      <div class="brand-content">
+
+        <!-- Ícono escudo que representa la seguridad y protección de datos del sistema -->
+        <div class="brand-logo-icon">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+
+        <h1>LEXYN PULSE PRO</h1>
+        <p class="brand-tagline">Plataforma Avanzada de Diagnóstico Legal y Tecnológico</p>
+
+        <!-- Indicador de conformidad normativa con la legislación ecuatoriana vigente -->
+        <div class="brand-footer-info">
+          <span><i class="fa-solid fa-gavel"></i> Conforme a la LODPD Ecuador</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!--
+     * Panel derecho que contiene el formulario de autenticación.
+     * Concentra toda la lógica interactiva de captura y
+     * validación de credenciales del usuario corporativo.
+    -->
+    <div class="login-form-side">
+
+      <!--
+       * Encabezado del formulario de acceso.
+       * Identifica el tipo de sistema y comunica al usuario
+       * el contexto de seguridad del proceso de autenticación.
+      -->
+      <div class="form-card-header">
+        <span class="system-badge">SISTEMA CORE</span>
+        <h2>Autenticación Segura</h2>
+        <p>Ingrese sus credenciales criptográficas de acceso</p>
+      </div>
+
+      <!-- Renderiza el mensaje de error de negocio cuando el Backend lo retorna -->
+      @if (errorMessage) {
+        <!--
+         * Contenedor de alerta accesible mediante role="alert".
+         * Garantiza que los lectores de pantalla anuncien
+         * el error de forma inmediata al usuario.
+        -->
+        <div class="alert-error-container" role="alert">
+          <!-- Ícono visual de advertencia que refuerza el estado de error -->
+          <div class="alert-icon">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <!-- Texto descriptivo del error retornado por el servidor -->
+          <div class="alert-text">
+            <strong>Error de Acceso:</strong> {{ errorMessage }}
+          </div>
+        </div>
+      }
+
+      <!--
+       * Formulario reactivo enlazado con loginForm del componente.
+       * Delega el procesamiento de credenciales al método onSubmit()
+       * evitando el comportamiento nativo de envío del navegador.
+      -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="interactive-form">
+
+        <!--
+         * Campo de captura del correo electrónico corporativo.
+         * Aplica validaciones reactivas de presencia y formato RFC 5322.
+         * El atributo autocomplete="username" mejora la experiencia
+         * en gestores de contraseñas y navegadores modernos.
+        -->
+        <div class="form-field-group">
+          <label for="correo">Correo Electrónico Corporativo</label>
+          <!-- Wrapper que posiciona el ícono decorativo sobre el input -->
+          <div class="input-icon-wrapper">
+            <i class="fa-solid fa-envelope field-icon"></i>
+            <input 
+              id="correo"
+              type="email" 
+              formControlName="correo" 
+              placeholder="nombre.apellido@empresa.com.ec"
+              [class.field-error]="loginForm.get('correo')?.touched && loginForm.get('correo')?.invalid"
+              autocomplete="username"
+            />
+          </div>
+          <!-- Notificación al usuario cuando el campo correo se encuentra vacío -->
+          @if (loginForm.get('correo')?.touched && loginForm.get('correo')?.hasError('required')) {
+            <span class="validation-message"><i class="fa-solid fa-circle-info"></i> El correo electrónico es un campo obligatorio.</span>
+          }
+          <!-- Notificación al usuario cuando el formato del correo ingresado es inválido -->
+          @if (loginForm.get('correo')?.touched && loginForm.get('correo')?.hasError('email')) {
+            <span class="validation-message"><i class="fa-solid fa-circle-info"></i> Ingrese un formato de correo electrónico corporativo válido.</span>
+          }
+        </div>
+
+        <!--
+         * Campo de captura de la contraseña de seguridad.
+         * El tipo password enmascara la entrada y previene su
+         * almacenamiento en el historial del DOM del navegador.
+         * El atributo autocomplete="current-password" habilita
+         * el autocompletado seguro desde gestores de contraseñas.
+        -->
+        <div class="form-field-group">
+          <label for="password">Contraseña de Seguridad</label>
+          <!-- Wrapper que posiciona el ícono decorativo sobre el input -->
+          <div class="input-icon-wrapper">
+            <i class="fa-solid fa-lock field-icon"></i>
+            <input 
+              id="password"
+              type="password" 
+              formControlName="password" 
+              placeholder="••••••••••••"
+              [class.field-error]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
+              autocomplete="current-password"
+            />
+          </div>
+          <!-- Notificación al usuario cuando el campo contraseña se encuentra vacío -->
+          @if (loginForm.get('password')?.touched && loginForm.get('password')?.hasError('required')) {
+            <span class="validation-message"><i class="fa-solid fa-circle-info"></i> La contraseña de acceso es requerida por el sistema.</span>
+          }
+        </div>
+
+        <!--
+         * Botón de envío del formulario de autenticación.
+         * Permanece deshabilitado mientras el formulario contenga
+         * errores de validación o exista una petición HTTP activa,
+         * previniendo así envíos duplicados al servidor.
+        -->
+        <button type="submit" [disabled]="loginForm.invalid || isLoading" class="btn-action-submit">
+          <!-- Indicador de proceso activo durante la verificación asíncrona de credenciales -->
+          @if (isLoading) {
+            <span class="loading-state">
+              <i class="fa-solid fa-circle-notch fa-spin"></i> Verificando Firma Digital...
+            </span>
+          } @else {
+            <!-- Estado estático del botón cuando no hay operaciones en curso -->
+            <span class="default-state">
+              <i class="fa-solid fa-key"></i> Iniciar Sesión Segura
+            </span>
+          }
+        </button>
+
+      </form>
+
+      <!--
+       * Pie del formulario que informa al usuario sobre el
+       * protocolo de seguridad activo en la transmisión de datos.
+      -->
+      <div class="form-card-footer">
+        <p><i class="fa-solid fa-lock-jwt"></i> Conexión cifrada de extremo a extremo vía JWT tokens.</p>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,327 @@
+<!--
+ * Contenedor raíz del módulo de gestión del cuestionario normativo.
+ * Estructura el layout administrativo incluyendo el sistema de
+ * notificaciones toast, el encabezado y el área de contenido principal.
+-->
+<div class="admin-layout">
+
+  <!--
+   * Sistema de notificaciones toast de retroalimentación operativa.
+   * Se renderiza únicamente cuando `toastData.show` es verdadero.
+   * Aplica estilos diferenciados según el tipo: error o éxito.
+  -->
+  @if (toastData.show) {
+    <div class="toast-notification" [ngClass]="toastData.type === 'error' ? 'toast-error' : 'toast-success'">
+      <!-- Ícono dinámico que refleja visualmente el tipo de notificación activa -->
+      <i class="fa-solid" [ngClass]="toastData.type === 'error' ? 'fa-circle-xmark' : 'fa-circle-check'"></i>
+      <span>{{ toastData.message }}</span>
+    </div>
+  }
+
+  <!--
+   * Encabezado de navegación del panel administrativo.
+   * Concentra la identidad de la plataforma, los accesos
+   * a los módulos del sistema y los datos del administrador activo.
+  -->
+  <header class="admin-header">
+
+    <!--
+     * Bloque de identidad visual de la marca.
+     * Presenta el ícono institucional, el nombre del producto
+     * y el módulo operativo activo en la sesión administrativa.
+    -->
+    <div class="brand-zone">
+      <i class="fa-solid fa-shield-halved brand-icon"></i>
+      <div class="brand-text">
+        <span class="app-title">LEXYN PULSE PRO</span>
+        <span class="app-subtitle">Matriz de Telemetría Global</span>
+      </div>
+    </div>
+
+    <!--
+     * Barra de navegación entre módulos administrativos del sistema.
+     * El ítem activo refleja el módulo en uso mediante la clase `active`.
+     * Los botones inactivos invocan métodos de enrutamiento del componente.
+    -->
+    <nav class="admin-nav-links">
+      <!-- Botón que navega al módulo de telemetría y métricas del dashboard -->
+      <button class="nav-item" (click)="irADashboard()"><i class="fa-solid fa-chart-line"></i> Dashboard</button>
+      <!-- Botón que navega al módulo de gestión y administración de clientes -->
+      <button class="nav-item" (click)="irAGestionClientes()"><i class="fa-solid fa-users-gear"></i> Clientes</button>
+      <button class="nav-item active"><i class="fa-solid fa-list-check"></i> Cuestionario</button>
+    </nav>
+
+    <!--
+     * Panel de metadatos e interacciones del administrador autenticado.
+     * Expone el nombre del administrador, su rol institucional y
+     * el control de cierre de sesión segura del sistema.
+    -->
+    <div class="user-zone">
+      <div class="user-meta">
+        <!-- Datos del perfil administrativo inyectados desde el componente -->
+        <span class="user-name">{{ nombreAdmin }}</span>
+        <span class="user-role"><i class="fa-solid fa-user-shield"></i> Administrador Core</span>
+      </div>
+      <!-- Botón que invoca el método de cierre de sesión y limpieza del token JWT -->
+      <button (click)="cerrarSesion()" class="btn-logout" title="Cerrar Sesión Segura">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+    </div>
+
+  </header>
+
+  <!--
+   * Área principal de contenido del módulo de ponderación normativa.
+   * Contiene el encabezado de página con el KPI de sumatoria,
+   * la acción de creación y la tabla maestra del cuestionario.
+  -->
+  <main class="admin-main-content">
+
+    <!--
+     * Encabezado de página con título descriptivo del módulo y
+     * controles de monitoreo de la sumatoria de pesos y creación de preguntas.
+    -->
+    <div class="page-title-header">
+      <div>
+        <h1><i class="fa-solid fa-scale-balanced"></i> Matriz de Ponderación Normativa</h1>
+        <p>Control maestro de ítems de evaluación, categorías legales y calibración del 100%</p>
+      </div>
+
+      <div class="header-actions-group">
+
+        <!--
+         * Indicador KPI de la sumatoria activa de pesos ponderados.
+         * Cambia de estilo según si la sumatoria alcanza exactamente
+         * el 100% requerido (`weight-ok`) o presenta desviación (`weight-alert`).
+        -->
+        <div class="weight-kpi-badge" [ngClass]="sumaPesosActual === 1 ? 'weight-ok' : 'weight-alert'">
+          <span class="kpi-label">SUMATORIA ACTIVA:</span>
+          <span class="kpi-value">{{ (sumaPesosActual * 100).toFixed(1) }}%</span>
+        </div>
+
+        <!-- Botón que abre el modal de creación de una nueva pregunta normativa -->
+        <button class="btn-primary" (click)="abrirModalCrear()">
+          <i class="fa-solid fa-plus"></i> Nueva Pregunta
+        </button>
+
+      </div>
+    </div>
+
+    <!--
+     * Sección de la matriz de datos del cuestionario normativo.
+     * Gestiona los estados asíncronos y renderiza la tabla
+     * interactiva cuando el catálogo de preguntas está disponible.
+    -->
+    <section class="data-matrix-section">
+
+      <!--
+       * Control de estados asíncronos de la consulta a la API.
+       * Gestiona tres escenarios de forma mutuamente excluyente:
+       * sincronización activa, error del servidor y catálogo listo.
+      -->
+      @if (isLoading) {
+        <!-- Indicador visual de espera durante la sincronización del árbol de preguntas -->
+        <div class="state-container">
+          <i class="fa-solid fa-circle-notch fa-spin state-icon loading"></i>
+          <p>Sincronizando árbol jerárquico de preguntas...</p>
+        </div>
+      } @else if (errorMessage) {
+        <!-- Contenedor de error que presenta el mensaje retornado por el Backend -->
+        <div class="state-container error-state">
+          <i class="fa-solid fa-triangle-exclamation state-icon"></i>
+          <p>{{ errorMessage }}</p>
+        </div>
+      } @else {
+
+        <!--
+         * Tabla maestra del catálogo de preguntas normativas envuelta en contenedor responsivo.
+         * Presenta el enunciado, categoría legal, peso ponderado, estado activo
+         * y acciones de gestión por cada ítem del cuestionario registrado.
+        -->
+        <div class="table-responsive-wrapper">
+          <table class="admin-data-table">
+            <thead>
+              <tr>
+                <th class="text-center">ID</th>
+                <th><i class="fa-solid fa-tag"></i> Categoría Legal</th>
+                <th><i class="fa-solid fa-quote-left"></i> Enunciado de la Pregunta</th>
+                <th class="text-center"><i class="fa-solid fa-weight-scale"></i> Peso (%)</th>
+                <th class="text-center"><i class="fa-solid fa-power-off"></i> Estado Activo</th>
+                <th class="text-center"><i class="fa-solid fa-sliders"></i> Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <!--
+               * Iteración nativa con Control Flow de Angular sobre el catálogo de preguntas.
+               * La clase `row-suspended` se aplica visualmente a los ítems
+               * desactivados para diferenciarlos del catálogo activo.
+              -->
+              @for (preg of preguntas; track preg.id; let i = $index) {
+                <tr class="table-row-hover" [class.row-suspended]="!preg.activo">
+
+                  <!-- Identificador único de la pregunta retornado por el Backend -->
+                  <td class="text-center font-bold text-gray">#{{ i + 1 }}</td>
+
+                  <!-- Categoría legal o normativa a la que pertenece la pregunta -->
+                  <td class="font-bold text-blue">{{ preg.tipo_categoria }}</td>
+
+                  <!--
+                   * Celda del enunciado de la pregunta con indicador del
+                   * total de opciones de respuesta asociadas al ítem.
+                  -->
+                  <td>
+                    <span class="text-dark font-medium">{{ preg.texto_pregunta }}</span><br>
+                    <span class="text-xs text-gray"><i class="fa-solid fa-layer-group"></i> Contiene {{ preg.opciones.length }} opciones de respuesta.</span>
+                  </td>
+
+                  <!-- Peso ponderado del ítem expresado en porcentaje con un decimal de precisión -->
+                  <td class="text-center font-mono font-bold">{{ (preg.peso_porcentaje * 100).toFixed(1) }}%</td>
+
+                  <!--
+                   * Celda de control de estado activo mediante toggle switch.
+                   * El switch invoca `conmutarEstadoPregunta()` al cambiar su estado
+                   * y se deshabilita mientras la operación asíncrona está en curso.
+                  -->
+                  <td class="text-center">
+                    <label class="switch-container">
+                      <input type="checkbox" [id]="'switch-' + preg.id" [checked]="preg.activo" (change)="conmutarEstadoPregunta(preg)" [disabled]="isToggling[preg.id]" class="switch-input">
+                      <span class="switch-slider"></span>
+                    </label>
+                  </td>
+
+                  <!-- Botón que abre el modal de edición con los parámetros precargados de la pregunta -->
+                  <td class="text-center">
+                    <button class="btn-action-edit" (click)="abrirModalEditar(preg)" title="Editar Cabecera">
+                      <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                  </td>
+
+                </tr>
+              } @empty {
+                <!--
+                 * Fila de estado vacío renderizada automáticamente por Angular
+                 * cuando el catálogo de preguntas retornado por la API está vacío.
+                -->
+                <tr><td colspan="6" class="empty-table-state"><p>El catálogo de preguntas está vacío.</p></td></tr>
+              }
+
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  </main>
+
+  <!--
+   * Modal de edición de parámetros de una pregunta existente.
+   * Se renderiza únicamente cuando `isModalOpen` es verdadero
+   * y `modalMode` tiene el valor 'EDITAR'.
+  -->
+  @if (isModalOpen) {
+    <div class="modal-backdrop">
+      <div class="modal-card modal-large">
+        <div class="modal-header">
+          <h2><i class="fa-solid" [ngClass]="modalMode === 'CREAR' ? 'fa-folder-plus' : 'fa-pen-to-square'"></i> {{ modalMode === 'CREAR' ? 'Estructurar Nueva Pregunta' : 'Editar Pregunta y Opciones' }}</h2>
+          <button class="btn-close-modal" (click)="cerrarModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <form [formGroup]="preguntaForm" (ngSubmit)="guardarFormulario()" class="modal-body scrollable-body">
+          
+          <h3 class="subsection-title">1. Atributos Principales de Auditoría</h3>
+          <div class="form-grid">
+            <div class="form-group span-2">
+              <label>Enunciado de la Pregunta</label>
+              <input type="text" formControlName="texto_pregunta" [class.field-error]="preguntaForm.get('texto_pregunta')?.invalid && preguntaForm.get('texto_pregunta')?.touched">
+              @if (preguntaForm.get('texto_pregunta')?.invalid && preguntaForm.get('texto_pregunta')?.touched) { <small class="text-error">El enunciado es obligatorio.</small> }
+            </div>
+            
+            <div class="form-group">
+              <label>Categoría</label>
+              <select formControlName="tipo_categoria" [class.field-error]="preguntaForm.get('tipo_categoria')?.invalid && preguntaForm.get('tipo_categoria')?.touched">
+                <option value="Organizacional">Organizacional</option>
+                <option value="Terceros">Terceros</option>
+                <option value="Técnica">Técnica</option>
+                <option value="Legal">Legal</option>
+                <option value="Contexto">Contexto</option>
+                <option value="Incidentes">Incidentes</option>
+              </select>
+              @if (preguntaForm.get('tipo_categoria')?.invalid && preguntaForm.get('tipo_categoria')?.touched) { <small class="text-error">Seleccione una categoría.</small> }
+            </div>
+            
+            <div class="form-group">
+              <label>Peso Ponderado (Ej. 0.05 para 5%)</label>
+              <input type="number" step="0.001" formControlName="peso_porcentaje" [class.field-error]="preguntaForm.get('peso_porcentaje')?.invalid && preguntaForm.get('peso_porcentaje')?.touched">
+              @if (preguntaForm.get('peso_porcentaje')?.invalid && preguntaForm.get('peso_porcentaje')?.touched) { <small class="text-error">Debe ser un valor entre 0.001 y 1.0</small> }
+            </div>
+          </div>
+
+          <h3 class="subsection-title mt-4">2. Opciones de Respuesta (Escala de Severidad 0-10)</h3>
+          
+          <div class="option-block option-low">
+            <div class="option-header"><span class="literal-badge">A</span> Opción de Cumplimiento Óptimo</div>
+            <div class="form-grid">
+              <div class="form-group span-2">
+                <input type="text" formControlName="opA_texto" [class.field-error]="preguntaForm.get('opA_texto')?.invalid && preguntaForm.get('opA_texto')?.touched">
+                @if (preguntaForm.get('opA_texto')?.invalid && preguntaForm.get('opA_texto')?.touched) { <small class="text-error">Texto obligatorio.</small> }
+              </div>
+              <div class="form-group">
+                <label>Puntaje de Riesgo</label>
+                <input type="number" step="0.1" formControlName="opA_score" [class.field-error]="preguntaForm.get('opA_score')?.invalid && preguntaForm.get('opA_score')?.touched">
+                @if (preguntaForm.get('opA_score')?.invalid && preguntaForm.get('opA_score')?.touched) { <small class="text-error">Debe estar entre 0 y 10.</small> }
+              </div>
+            </div>
+          </div>
+
+          <div class="option-block option-medium">
+            <div class="option-header"><span class="literal-badge">B</span> Opción de Riesgo Menor</div>
+            <div class="form-grid">
+              <div class="form-group span-2">
+                <input type="text" formControlName="opB_texto" [class.field-error]="preguntaForm.get('opB_texto')?.invalid && preguntaForm.get('opB_texto')?.touched">
+              </div>
+              <div class="form-group">
+                <label>Puntaje de Riesgo</label>
+                <input type="number" step="0.1" formControlName="opB_score" [class.field-error]="preguntaForm.get('opB_score')?.invalid && preguntaForm.get('opB_score')?.touched">
+                @if (preguntaForm.get('opB_score')?.invalid && preguntaForm.get('opB_score')?.touched) { <small class="text-error">Debe estar entre 0 y 10.</small> }
+              </div>
+            </div>
+          </div>
+
+          <div class="option-block option-high">
+            <div class="option-header"><span class="literal-badge">C</span> Opción de Riesgo Moderado</div>
+            <div class="form-grid">
+              <div class="form-group span-2">
+                <input type="text" formControlName="opC_texto" [class.field-error]="preguntaForm.get('opC_texto')?.invalid && preguntaForm.get('opC_texto')?.touched">
+              </div>
+              <div class="form-group">
+                <label>Puntaje de Riesgo</label>
+                <input type="number" step="0.1" formControlName="opC_score" [class.field-error]="preguntaForm.get('opC_score')?.invalid && preguntaForm.get('opC_score')?.touched">
+                @if (preguntaForm.get('opC_score')?.invalid && preguntaForm.get('opC_score')?.touched) { <small class="text-error">Debe estar entre 0 y 10.</small> }
+              </div>
+            </div>
+          </div>
+
+          <div class="option-block option-critical">
+            <div class="option-header"><span class="literal-badge">D</span> Opción de Peligro Crítico Inminente</div>
+            <div class="form-grid">
+              <div class="form-group span-2">
+                <input type="text" formControlName="opD_texto" [class.field-error]="preguntaForm.get('opD_texto')?.invalid && preguntaForm.get('opD_texto')?.touched">
+              </div>
+              <div class="form-group">
+                <label>Puntaje de Riesgo</label>
+                <input type="number" step="0.1" formControlName="opD_score" [class.field-error]="preguntaForm.get('opD_score')?.invalid && preguntaForm.get('opD_score')?.touched">
+                @if (preguntaForm.get('opD_score')?.invalid && preguntaForm.get('opD_score')?.touched) { <small class="text-error">Debe estar entre 0 y 10.</small> }
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary" (click)="cerrarModal()" [disabled]="isSaving">Cancelar</button>
+            <button type="submit" class="btn-primary" [disabled]="preguntaForm.invalid || isSaving">Procesar e Inyectar a BD</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+</div>

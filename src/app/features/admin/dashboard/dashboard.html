@@ -1,0 +1,246 @@
+<!--
+ * Contenedor raíz del módulo administrativo del sistema.
+ * Estructura el layout en dos niveles: encabezado de
+ * administración global y área de contenido de telemetría.
+-->
+<div class="admin-layout">
+
+  <!--
+   * Encabezado de navegación del panel administrativo.
+   * Concentra la identidad de la plataforma, los accesos
+   * a los módulos del sistema y los datos del administrador activo.
+  -->
+  <header class="admin-header">
+
+    <!--
+     * Bloque de identidad visual de la marca.
+     * Presenta el ícono institucional, el nombre del producto
+     * y el módulo operativo activo en la sesión administrativa.
+    -->
+    <div class="brand-zone">
+      <i class="fa-solid fa-shield-halved brand-icon"></i>
+      <div class="brand-text">
+        <span class="app-title">LEXYN PULSE PRO</span>
+        <span class="app-subtitle">Matriz de Telemetría Global</span>
+      </div>
+    </div>
+
+    <!--
+     * Barra de navegación entre módulos administrativos del sistema.
+     * El ítem activo refleja el módulo en uso mediante la clase `active`.
+     * Los botones inactivos invocan métodos de enrutamiento del componente.
+    -->
+    <nav class="admin-nav-links">
+      <button class="nav-item active"><i class="fa-solid fa-chart-line"></i> Dashboard</button>
+      <!-- Botón que navega al módulo de gestión y administración de clientes -->
+      <button class="nav-item" (click)="irAGestionClientes()"><i class="fa-solid fa-users-gear"></i> Clientes</button>
+      <!-- Botón que navega al módulo de administración del cuestionario normativo -->
+      <button class="nav-item" (click)="irAGestionPreguntas()"><i class="fa-solid fa-list-check"></i> Cuestionario</button>
+    </nav>
+
+    <!--
+     * Panel de metadatos e interacciones del administrador autenticado.
+     * Expone el nombre del administrador, su rol institucional y
+     * el control de cierre de sesión segura del sistema.
+    -->
+    <div class="user-zone">
+      <div class="user-meta">
+        <!-- Datos del perfil administrativo inyectados desde el componente -->
+        <span class="user-name">{{ nombreAdmin }}</span>
+        <span class="user-role"><i class="fa-solid fa-user-shield"></i> Administrador Core</span>
+      </div>
+      <!-- Botón que invoca el método de cierre de sesión y limpieza del token JWT -->
+      <button (click)="cerrarSesion()" class="btn-logout" title="Cerrar Sesión Segura">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+    </div>
+
+  </header>
+
+  <!--
+   * Área principal de contenido del panel administrativo.
+   * Contiene la grilla de KPIs ejecutivos y la matriz
+   * de auditoría global de organizaciones evaluadas.
+  -->
+  <main class="admin-main-content">
+
+    <!--
+     * Grilla de tarjetas de indicadores clave de rendimiento (KPI).
+     * Presenta métricas ejecutivas globales del sistema en tiempo real:
+     * evaluaciones procesadas, empresas en riesgo crítico y módulo más sugerido.
+    -->
+    <div class="kpi-cards-grid">
+
+      <!-- KPI: Total de evaluaciones procesadas por la plataforma -->
+      <div class="kpi-card">
+        <div class="kpi-icon-box bg-blue"><i class="fa-solid fa-server"></i></div>
+        <div class="kpi-data">
+          <h3>Evaluaciones Procesadas</h3>
+          <span class="kpi-value">{{ totalEvaluaciones }}</span>
+        </div>
+      </div>
+
+      <!-- KPI: Total de empresas con nivel de riesgo crítico detectado -->
+      <div class="kpi-card">
+        <div class="kpi-icon-box bg-red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div class="kpi-data">
+          <h3>Empresas en Riesgo Crítico</h3>
+          <span class="kpi-value">{{ totalEmpresasRiesgoCritico }}</span>
+        </div>
+      </div>
+
+      <!-- KPI: Módulo de la Suite Lexyn recomendado con mayor frecuencia por el algoritmo -->
+      <div class="kpi-card">
+        <div class="kpi-icon-box bg-green"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+        <div class="kpi-data">
+          <h3>Módulo Más Sugerido</h3>
+          <!-- Bindeo reactivo de la licencia calculada por el algoritmo del componente -->
+          <span class="kpi-value text-sm">{{ moduloMasSugerido }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!--
+     * Sección de la matriz de auditoría general de organizaciones.
+     * Presenta el desglose analítico de puntajes normativos y las
+     * proyecciones de licenciamiento por cada evaluación procesada.
+    -->
+    <section class="data-matrix-section">
+
+      <!--
+       * Encabezado descriptivo de la sección de auditoría.
+       * Comunica el alcance del análisis tabular disponible
+       * para la supervisión administrativa del sistema.
+      -->
+      <div class="section-header">
+        <div>
+          <h2><i class="fa-solid fa-table-list"></i> Auditoría General de Organizaciones</h2>
+          <p>Desglose analítico de puntajes normativos y proyecciones de licenciamiento</p>
+        </div>
+      </div>
+
+      <!--
+       * Control de estados asíncronos de la consulta a la API.
+       * Gestiona tres escenarios de forma mutuamente excluyente:
+       * sincronización activa, error del servidor y datos listos.
+      -->
+      @if (isLoading) {
+        <!-- Indicador visual de espera durante la sincronización de telemetría global -->
+        <div class="state-container">
+          <i class="fa-solid fa-circle-notch fa-spin state-icon loading"></i>
+          <p>Sincronizando telemetría en tiempo real...</p>
+        </div>
+      } @else if (errorMessage) {
+        <!-- Contenedor de error que presenta el mensaje retornado por el Backend -->
+        <div class="state-container error-state">
+          <i class="fa-solid fa-triangle-exclamation state-icon"></i>
+          <p>{{ errorMessage }}</p>
+        </div>
+      } @else {
+
+        <!--
+         * Tabla maestra de auditoría global envuelta en contenedor responsivo.
+         * Presenta datos normativos, financieros y de riesgo por organización,
+         * adaptando su visualización a diferentes resoluciones de pantalla.
+        -->
+        <div class="table-responsive-wrapper">
+          <table class="admin-data-table">
+            <thead>
+              <tr>
+                <th>Fecha Emisión</th>
+                <th>Organización</th>
+                <th class="text-center">Score</th>
+                <th>Riesgo Evaluado</th>
+                <th class="text-center">Licencia Sugerida</th>
+                <!-- Columnas financieras de proyección de precios por módulo de la Suite Lexyn -->
+                <th class="financial-col bg-light-blue">PVP Pulse</th>
+                <th class="financial-col bg-light-blue">PVP Sentinel</th>
+                <th class="financial-col bg-light-blue">Suscripción Care</th>
+                <th class="text-center"><i class="fa-solid fa-file-pdf"></i> Reporte</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <!--
+               * Iteración nativa con Control Flow de Angular sobre el arreglo
+               * de evaluaciones globales retornado por la API. La clave única
+               * `evaluacion.id` optimiza la detección de cambios en el renderizado.
+              -->
+              @for (evaluacion of evaluacionesGlobales; track evaluacion.id) {
+                <tr class="table-row-hover">
+
+                  <!-- Fecha de creación del diagnóstico formateada en zona horaria local -->
+                  <td class="font-mono text-sm text-gray">{{ evaluacion.creado_en | date:'dd/MM/yyyy HH:mm' }}</td>
+
+                  <!--
+                   * Celda de organización con alias corregido e incorporación del sector.
+                   * Presenta el nombre actualizado de la empresa con fallback defensivo,
+                   * y el sector económico registrado al momento de la evaluación.
+                  -->
+                  <td>
+                    <span class="font-bold text-dark">{{ evaluacion.usuario_empresa_actual || 'Empresa No Definida' }}</span><br/>
+                    <span class="text-xs text-gray"><i class="fa-solid fa-briefcase"></i> {{ evaluacion.empresa_sector_momento || 'Sector No Especificado' }}</span>
+                  </td>
+
+                  <!-- Score global de la evaluación formateado con un decimal de precisión -->
+                  <td class="text-center font-bold text-dark">{{ evaluacion.score_final | number:'1.1-1' }}</td>
+
+                  <td>
+                    <!--
+                     * Marcador dinámico de severidad legal de la organización.
+                     * La comparación en minúsculas garantiza coincidencia independiente
+                     * del formato retornado por el Backend. Soporta 'crítico' con y sin tilde.
+                    -->
+                    <span class="risk-badge" [ngClass]="{
+                      'risk-low': evaluacion.nivel_riesgo.toLowerCase() === 'bajo',
+                      'risk-medium': evaluacion.nivel_riesgo.toLowerCase() === 'medio',
+                      'risk-high': evaluacion.nivel_riesgo.toLowerCase() === 'alto',
+                      'risk-critical': evaluacion.nivel_riesgo.toLowerCase() === 'crítico' || evaluacion.nivel_riesgo.toLowerCase() === 'critico'
+                    }">
+                      {{ evaluacion.nivel_riesgo | uppercase }}
+                    </span>
+                  </td>
+
+                  <!-- Licencia de la Suite Lexyn recomendada para la organización, centrada visualmente -->
+                  <td class="text-center font-bold text-blue">{{ evaluacion.producto_recomendado }}</td>
+
+                  <!-- Precio del módulo Pulse con impuestos incluidos formateado en USD -->
+                  <td class="financial-cell">{{ evaluacion.precio_pulse_con_impuesto | currency:'USD':'symbol':'1.2-2' }}</td>
+
+                  <!-- Precio del módulo Sentinel con urgencia e impuestos incluidos en USD -->
+                  <td class="financial-cell">{{ evaluacion.precio_sentinel_con_urgencia_impuesto | currency:'USD':'symbol':'1.2-2' }}</td>
+
+                  <!-- Precio mensual de la suscripción Care formateado en USD -->
+                  <td class="financial-cell font-bold">{{ evaluacion.precio_care_mensual | currency:'USD':'symbol':'1.2-2' }}/mes</td>
+
+                  <!-- Botón de acción para visualizar el informe detallado de IA, con ícono y tooltip descriptivo -->
+                  <td class="text-center">
+                  <button class="btn-action-edit" (click)="verReporteDetallado(evaluacion.id)" title="Ver Informe Detallado de IA">
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                </td>
+
+                </tr>
+              } @empty {
+                <!--
+                 * Fila de estado vacío renderizada automáticamente por Angular
+                 * cuando el arreglo retornado por la API no contiene elementos.
+                -->
+                <tr>
+                  <td colspan="8" class="empty-table-state">
+                    <i class="fa-solid fa-inbox"></i>
+                    <p>No existen registros de evaluaciones procesadas en la plataforma.</p>
+                  </td>
+                </tr>
+              }
+
+            </tbody>
+          </table>
+        </div>
+
+      }
+    </section>
+
+  </main>
+</div>

@@ -1,0 +1,278 @@
+/* ==========================================================================
+   CONTENEDOR MAESTRO Y DISTRIBUCIÓN ADAPTATIVA (MOBILE-FIRST)
+   ========================================================================== */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #0f172a; /* Fondo pizarra ultra oscuro */
+  padding: 1rem;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.login-wrapper {
+  display: grid;
+  grid-template-columns: 1fr; /* Una sola columna para móviles por defecto */
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 1000px;
+  min-height: 580px;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   PANEL DE BRANDING COMPLIANCE (OCULTO EN MÓVILES)
+   ========================================================================== */
+.login-brand-side {
+  display: none; /* Por defecto no se muestra en layouts de celular */
+  position: relative;
+  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+  padding: 3rem;
+  color: #ffffff;
+}
+
+.brand-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(#3b82f6 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.15;
+}
+
+.brand-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  z-index: 2;
+}
+
+.brand-logo-icon {
+  font-size: 2.5rem;
+  color: #3b82f6;
+  margin-bottom: 2rem;
+}
+
+.brand-content h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin: 0 0 1rem 0;
+  color: #f8fafc;
+}
+
+.brand-tagline {
+  font-size: 1.1rem;
+  color: #94a3b8;
+  line-height: 1.6;
+  max-width: 320px;
+}
+
+.brand-footer-info {
+  margin-top: auto;
+  font-size: 0.85rem;
+  color: #64748b;
+  /* border-top: 1px solid #1e293b; */
+  padding-top: 1.5rem;
+}
+
+/* ==========================================================================
+   PANEL FORMULARIO INTERACTIVO
+   ========================================================================== */
+.login-form-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2.5rem;
+  background-color: #ffffff;
+}
+
+.form-card-header {
+  margin-bottom: 2rem;
+}
+
+.system-badge {
+  display: inline-block;
+  background-color: #f1f5f9;
+  color: #475569;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.75rem;
+}
+
+.form-card-header h2 {
+  color: #0f172a;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.form-card-header p {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 0.5rem 0 0 0;
+}
+
+/* ==========================================================================
+   CAMPOS DE CAPTURA CON ICONOS INTEGRADOS
+   ========================================================================== */
+.form-field-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-field-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.5rem;
+}
+
+.input-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.field-icon {
+  position: absolute;
+  left: 1rem;
+  color: #94a3b8;
+  font-size: 0.95rem;
+  transition: color 0.2s;
+}
+
+.form-field-group input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem; /* Margen izquierdo extra para no pisar el icono */
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: #0f172a;
+  background-color: #f8fafc;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.form-field-group input:focus {
+  outline: none;
+  border-color: #2563eb;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.form-field-group input:focus + .field-icon {
+  color: #2563eb;
+}
+
+/* Control de Errores Visuales */
+.field-error {
+  border-color: #ef4444 !important;
+  background-color: #fef2f2 !important;
+}
+
+.validation-message {
+  display: block;
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.4rem;
+  font-weight: 500;
+}
+
+.validation-message i {
+  margin-right: 2px;
+}
+
+/* ==========================================================================
+   ALERTAS CORPORATIVAS (MOCK AUDITORÍA)
+   ========================================================================== */
+.alert-error-container {
+  display: flex;
+  align-items: flex-start;
+  background-color: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-left: 4px solid #ef4444;
+  padding: 0.85rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+}
+
+.alert-icon {
+  color: #ef4444;
+  font-size: 1rem;
+  margin-right: 0.75rem;
+  margin-top: 1px;
+}
+
+.alert-text {
+  color: #991b1b;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   BOTONES DE CONTROL TRANSACCIONAL
+   ========================================================================== */
+.btn-action-submit {
+  width: 100%;
+  padding: 0.85rem;
+  background-color: #1e3a8a;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 0.75rem;
+}
+
+.btn-action-submit:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+.btn-action-submit:disabled {
+  background-color: #cbd5e1;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.form-card-footer {
+  margin-top: 2rem;
+  border-top: 1px solid #c9d5e0;
+  padding-top: 1rem;
+  text-align: center;
+}
+
+.form-card-footer p {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* ==========================================================================
+   MEDIA QUERIES - RESPONSIVIDAD SÉNIOR (TABLETS Y LAPTOPS)
+   ========================================================================== */
+@media (min-width: 768px) {
+  .login-wrapper {
+    grid-template-columns: 45% 55%; /* Activación del sistema de dos paneles */
+  }
+
+  .login-brand-side {
+    display: block; /* Despierta el branding lateral en resoluciones amplias */
+  }
+
+  .login-form-side {
+    padding: 3.5rem; /* Espaciado premium para escritorio */
+  }
+}

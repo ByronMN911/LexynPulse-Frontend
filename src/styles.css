@@ -1,0 +1,10 @@
+/* * RESET GLOBAL DE LA APLICACIÓN
+ * Elimina los márgenes nativos del navegador para permitir 
+ * que los contenedores oscuros ocupen el 100% real de la pantalla.
+ */
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: #0f172a; /* Evita destellos blancos involuntarios al cargar la app */
+}
