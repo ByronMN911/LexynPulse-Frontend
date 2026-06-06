@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class EvaluationService {
   // URL base unificada apuntando al controlador de evaluaciones de Express
-  private apiUrl = 'http://localhost:3000/api/evaluaciones';
+  private apiUrl = 'https://lexyn-pulse-api.onrender.com/api';
   
   // Inyección funcional del cliente HTTP nativo
   private http = inject(HttpClient);

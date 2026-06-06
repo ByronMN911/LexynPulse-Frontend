@@ -24,7 +24,7 @@ export class AuthService {
    * URL base apuntando al módulo de autenticación expuesto
    * por el backend Node.js.
    */
-  private apiUrl = 'http://localhost:3000/api/auth';
+  private apiUrl = 'https://lexyn-pulse-api.onrender.com/api';
   
   /*
    * Flujo reactivo que mantiene y distribuye el estado actual

@@ -13,7 +13,7 @@ import { Observable } from 'rxjs';
 export class PreguntaService {
   
   // URL base del módulo de preguntas apuntando al controlador correspondiente del backend
-  private apiUrl = 'http://localhost:3000/api/preguntas';
+  private apiUrl = 'https://lexyn-pulse-api.onrender.com/api';
   
   // Inyección funcional del cliente HTTP para la comunicación con la API REST
   private http = inject(HttpClient);
