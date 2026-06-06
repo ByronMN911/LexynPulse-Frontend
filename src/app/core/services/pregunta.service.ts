@@ -35,7 +35,7 @@ export class PreguntaService {
    * desde la interfaz administrativa.
    */
   crearPregunta(payload: any): Observable<any> {
-    return this.http.post<any>(this.apiUrl, payload);
+    return this.http.post<any>(`${this.apiUrl}/preguntas`, payload);
   }
 
   /*
@@ -44,6 +44,6 @@ export class PreguntaService {
    * para sincronizar la información persistida en la base de datos.
    */
   actualizarPregunta(id: number, payload: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, payload);
+    return this.http.put<any>(`${this.apiUrl}/preguntas/${id}`, payload);
   }
 }
