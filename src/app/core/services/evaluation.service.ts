@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environmet'; 
+import { environment } from '../../../environments/environment'; 
 
 
 @Injectable({
@@ -53,5 +53,14 @@ export class EvaluationService {
    */
   getDashboardGlobal(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/evaluaciones/dashboard`);
+  }
+
+  /*
+   * Endpoint de acceso público para la auditoría de documentos PDF.
+   * Valida la inmutabilidad y autenticidad del reporte generado.
+   * Backend: GET /api/evaluaciones/verificar/:codigo
+   */
+  verificarCodigoPdf(codigo: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/evaluaciones/verificar/${codigo}`);
   }
 }

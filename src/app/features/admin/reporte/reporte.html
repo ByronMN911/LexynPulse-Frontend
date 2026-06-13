@@ -7,8 +7,14 @@
         <span class="app-subtitle">Auditoría de Reporte Específico</span>
       </div>
     </div>
-    <div class="user-zone">
-      <button class="btn-secondary" (click)="volverAlDashboard()"><i class="fa-solid fa-arrow-left"></i> Volver a la Matriz</button>
+    
+    <div class="user-zone" style="display: flex; gap: 1rem;">
+      <button class="btn-primary-pdf" (click)="descargarPdf()" [disabled]="isLoading || !reporte">
+        <i class="fa-solid fa-file-pdf"></i> Exportar PDF
+      </button>
+      <button class="btn-secondary" (click)="volverAlDashboard()">
+        <i class="fa-solid fa-arrow-left"></i> Volver a la Matriz
+      </button>
     </div>
   </header>
 

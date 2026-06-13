@@ -1,0 +1,64 @@
+<div class="auditoria-layout">
+  <div class="auditoria-card">
+    
+    <div class="auditoria-header">
+      <i class="fa-solid fa-shield-halved"></i>
+      <h2>Portal de Verificación Criptográfica</h2>
+      <p>Ingrese el código impreso en el pie de página de su reporte PDF para verificar su autenticidad y validez legal.</p>
+    </div>
+
+    <div class="search-box">
+      <input 
+        type="text" 
+        [(ngModel)]="codigoIngresado" 
+        placeholder="Ej: LXP-B30E69B8-958439"
+        (keyup.enter)="validarDocumento()"
+        [disabled]="isLoading"
+      />
+      <button (click)="validarDocumento()" [disabled]="isLoading">
+        @if (isLoading) {
+          <i class="fa-solid fa-circle-notch fa-spin"></i> Validando...
+        } @else {
+          <i class="fa-solid fa-magnifying-glass"></i> Verificar
+        }
+      </button>
+    </div>
+
+    @if (errorVerificacion) {
+      <div class="result-box alert-error">
+        <i class="fa-solid fa-circle-xmark"></i>
+        <div>
+          <h4>Documento No Reconocido</h4>
+          <p>{{ errorVerificacion }}</p>
+        </div>
+      </div>
+    }
+
+    @if (documentoVerificado) {
+      <div class="result-box alert-success">
+        <div class="success-header">
+          <i class="fa-solid fa-certificate"></i>
+          <h4>Documento Original Autenticado</h4>
+        </div>
+        
+        <div class="document-details">
+          <div class="detail-row">
+            <span>Organización:</span>
+            <strong>{{ documentoVerificado.empresa_nombre }}</strong>
+          </div>
+          <div class="detail-row">
+            <span>Fecha de Emisión (UTC):</span>
+            <strong>{{ documentoVerificado.fecha_evaluacion | date:'medium' }}</strong>
+          </div>
+          <div class="detail-row">
+            <span>Nivel de Riesgo Certificado:</span>
+            <strong>{{ documentoVerificado.nivel_riesgo | uppercase }}</strong>
+          </div>
+        </div>
+        
+        <button (click)="limpiarBusqueda()" class="btn-reset">Validar otro documento</button>
+      </div>
+    }
+
+  </div>
+</div>

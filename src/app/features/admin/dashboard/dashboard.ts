@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { EvaluationService } from '../../../core/services/evaluation.service';
-import { jwtDecode } from 'jwt-decode';
+import { AdminNavbarComponent } from '../../../shared/components/admin-navbar/admin-navbar';
+
 
 /*
  * Decorador que registra este artefacto como un componente Standalone
@@ -13,7 +14,7 @@ import { jwtDecode } from 'jwt-decode';
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AdminNavbarComponent ],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']
 })
@@ -30,11 +31,6 @@ export class DashboardComponent implements OnInit {
   private evaluationService = inject(EvaluationService);
   private router = inject(Router);
 
-  /*
-   * Nombre del administrador autenticado recuperado desde el token JWT.
-   * Se utiliza para personalizar la experiencia visual del panel.
-   */
-  public nombreAdmin: string = '';
 
   /*
    * Colección completa de evaluaciones recuperadas desde el backend.
@@ -79,36 +75,7 @@ export class DashboardComponent implements OnInit {
    * componente es inicializado dentro del árbol de Angular.
    */
   ngOnInit(): void {
-    this.cargarDatosAdministrador();
-  }
-
-  /*
-   * Recupera y valida la identidad del administrador autenticado
-   * mediante la decodificación segura del token JWT almacenado.
-   */
-  private cargarDatosAdministrador(): void {
-    const token = this.authService.getToken();
-
-    // Si no existe una sesión válida, se fuerza el cierre de sesión
-    if (!token) {
-      this.cerrarSesion();
-      return;
-    }
-
-    try {
-      // Decodificación del token para recuperar información del usuario autenticado
-      const payload: any = jwtDecode(token);
-
-      this.nombreAdmin = payload.nombre || 'Administrador del Sistema';
-      
-      // Una vez validada la identidad se inicia la carga del dashboard
-      this.cargarMatrizTelemetria();
-
-    } catch (error) {
-
-      // Ante cualquier inconsistencia en el token se invalida la sesión
-      this.cerrarSesion();
-    }
+    this.cargarMatrizTelemetria();
   }
 
   /*
@@ -204,31 +171,6 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  /*
-   * Finaliza la sesión activa eliminando las credenciales locales
-   * y redirigiendo al usuario hacia la pantalla de autenticación.
-   */
-  public cerrarSesion(): void {
-    this.authService.logout();
-    this.router.navigate(['/auth/login']);
-  }
-
-  /*
-   * Módulo de gestión y administración de clientes.
-   */
-  public irAGestionClientes(): void {
-    this.router.navigate(['/admin/clientes']);
-  }
-
-  /*
-   * Catálogo dinámico de preguntas del sistema.
-   */
-  public irAGestionPreguntas(): void {
-    this.router.navigate(['/admin/preguntas']);
-  }
-  /*
-   * Redirige al administrador a la pantalla de visualización del informe detallado de IA.
-   */
   public verReporteDetallado(evaluacionId: string): void {
     this.router.navigate(['/admin/reporte', evaluacionId]);
   }

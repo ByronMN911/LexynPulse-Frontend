@@ -52,3 +52,31 @@
 .report-list-container { margin: 0.5rem 0 1rem 1.5rem; padding: 0; }
 .report-list-item { margin-bottom: 0.4rem; line-height: 1.5; color: #334155; }
 .text-highlight { color: #0f172a; font-weight: 700; }
+
+
+/* ==========================================================================
+   BOTÓN DE EXPORTACIÓN PDF (ADMIN)
+   ========================================================================== */
+.btn-primary-pdf {
+  background-color: #3b82f6;
+  border: none;
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.btn-primary-pdf:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.btn-primary-pdf:disabled {
+  background-color: #cbd5e1;
+  color: #f8fafc;
+  cursor: not-allowed;
+}

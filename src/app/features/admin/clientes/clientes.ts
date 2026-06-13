@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
-import { jwtDecode } from 'jwt-decode';
+import { AdminNavbarComponent } from '../../../shared/components/admin-navbar/admin-navbar';
 
 /*
  * Decorador que registra este artefacto como un componente Standalone,
@@ -13,7 +13,7 @@ import { jwtDecode } from 'jwt-decode';
 @Component({
   selector: 'app-admin-clientes',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, AdminNavbarComponent],
   templateUrl: './clientes.html',
   styleUrls: ['./clientes.css']
 })
@@ -31,11 +31,6 @@ export class ClientesComponent implements OnInit {
   private router = inject(Router);
   private fb = inject(FormBuilder);
 
-  /*
-   * Nombre del administrador autenticado recuperado desde el token JWT.
-   * Se utiliza para personalizar la experiencia dentro del panel.
-   */
-  public nombreAdmin: string = '';
 
   /*
    * Directorio completo de clientes corporativos recuperado desde
@@ -126,37 +121,9 @@ export class ClientesComponent implements OnInit {
    * instanciar el componente dentro del árbol Angular.
    */
   ngOnInit(): void {
-    this.validarIdentidadYExtraerDatos();
+    this.cargarDirectorioClientes();
   }
 
-  /*
-   * Verifica la existencia de una sesión válida, extrae la identidad
-   * del administrador autenticado y habilita la carga del directorio.
-   */
-  private validarIdentidadYExtraerDatos(): void {
-    const token = this.authService.getToken();
-
-    // Si no existe una sesión válida, se finaliza el acceso
-    if (!token) {
-      this.cerrarSesion();
-      return;
-    }
-
-    try {
-      // Decodificación segura del token JWT
-      const payload: any = jwtDecode(token);
-
-      this.nombreAdmin = payload.nombre || 'Administrador Core';
-
-      // Carga inicial del catálogo corporativo de clientes
-      this.cargarDirectorioClientes();
-
-    } catch (error) {
-
-      // Ante cualquier inconsistencia del token se invalida la sesión
-      this.cerrarSesion();
-    }
-  }
 
   /*
    * Recupera desde el backend el catálogo completo de clientes
@@ -414,28 +381,7 @@ export class ClientesComponent implements OnInit {
     }, 4000);
   }
 
-  // NAVEGACIÓN
 
-  /*
-   * Redirige al panel principal de administración.
-   */
-  public irADashboard(): void {
-    this.router.navigate(['/admin/dashboard']);
-  }
-
-  /*
-   * Redirige al módulo de administración de preguntas.
-   */
-  public irAGestionPreguntas(): void {
-    this.router.navigate(['/admin/preguntas']);
-  }
-
-  /*
-   * Finaliza la sesión activa y retorna al usuario
-   * a la pantalla de autenticación.
-   */
-  public cerrarSesion(): void {
-    this.authService.logout();
-    this.router.navigate(['/auth/login']);
-  }
+  
+  
 }

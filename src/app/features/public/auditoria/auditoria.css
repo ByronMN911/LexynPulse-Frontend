@@ -1,0 +1,245 @@
+/* ==========================================================================
+   CONTENEDOR MAESTRO (HEREDA EL ESTILO OSCURO DEL LOGIN)
+   ========================================================================== */
+.auditoria-layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #0f172a; /* Fondo pizarra ultra oscuro corporativo */
+  padding: 1.5rem;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ==========================================================================
+   TARJETA CENTRAL DE VERIFICACIÓN
+   ========================================================================== */
+.auditoria-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 650px;
+  padding: 3rem 2.5rem;
+  box-sizing: border-box;
+}
+
+.auditoria-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.auditoria-header i {
+  font-size: 3rem;
+  color: #3b82f6; /* Azul primario de Lexyn */
+  margin-bottom: 1.25rem;
+}
+
+.auditoria-header h2 {
+  color: #0f172a;
+  font-size: 1.7rem;
+  font-weight: 800;
+  margin: 0 0 0.75rem 0;
+  letter-spacing: -0.5px;
+}
+
+.auditoria-header p {
+  color: #64748b;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0 1rem;
+}
+
+/* ==========================================================================
+   CAJA DE BÚSQUEDA INTERACTIVA
+   ========================================================================== */
+.search-box {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 0.85rem 1.25rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: 'Consolas', monospace; /* Fuente monoespaciada para códigos */
+  color: #0f172a;
+  background-color: #f8fafc;
+  transition: all 0.2s;
+  box-sizing: border-box;
+  text-transform: uppercase;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #2563eb;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.search-box button {
+  padding: 0.85rem 1.5rem;
+  background-color: #1e3a8a; /* Azul institucional fuerte */
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.search-box button:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+.search-box button:disabled {
+  background-color: #cbd5e1;
+  color: #f8fafc;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   RESULTADOS DE VALIDACIÓN (FEEDBACK VISUAL)
+   ========================================================================== */
+.result-box {
+  margin-top: 2rem;
+  border-radius: 8px;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 1. Alerta de Error (Documento Falso) */
+.alert-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background-color: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-left: 4px solid #ef4444; /* Borde izquierdo grueso rojo */
+  padding: 1.25rem;
+}
+
+.alert-error i {
+  color: #ef4444;
+  font-size: 1.5rem;
+  margin-top: 2px;
+}
+
+.alert-error h4 {
+  color: #991b1b;
+  margin: 0 0 0.25rem 0;
+  font-size: 1.05rem;
+}
+
+.alert-error p {
+  color: #b91c1c;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* 2. Alerta de Éxito (Certificado Auténtico) */
+.alert-success {
+  background-color: #f0fdf4;
+  border: 1px solid #dcfce7;
+  border-top: 4px solid #10b981; /* Borde superior grueso verde */
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.success-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  color: #15803d;
+}
+
+.success-header i {
+  font-size: 1.5rem;
+}
+
+.success-header h4 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+/* Detalles del Documento Certificado */
+.document-details {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.5rem 1.25rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row span {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.detail-row strong {
+  color: #0f172a;
+  font-size: 0.95rem;
+  text-align: right;
+}
+
+/* Botón Secundario de Reinicio */
+.btn-reset {
+  margin-top: 1.5rem;
+  width: 100%;
+  padding: 0.85rem;
+  background-color: #ffffff;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-reset:hover {
+  background-color: #f8fafc;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+/* ==========================================================================
+   MEDIA QUERIES - DESKTOP
+   ========================================================================== */
+@media (min-width: 640px) {
+  .search-box {
+    flex-direction: row; /* En PC, el input y el botón se ponen en la misma fila */
+  }
+  
+  .auditoria-header p {
+    padding: 0 2rem;
+  }
+}

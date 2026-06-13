@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
-import { environment } from '../../../environments/environmet'; 
+import { environment } from '../../../environments/environment'; 
 
 /*
  * Decorador de Angular que registra este servicio en el inyector

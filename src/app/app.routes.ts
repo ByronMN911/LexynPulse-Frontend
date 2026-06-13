@@ -26,6 +26,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/login/login').then(m => m.LoginComponent)
   },
 
+  { 
+  path: 'auditoria', 
+  loadComponent: () => import('../app/features/public/auditoria/auditoria').then(m => m.AuditoriaComponent)
+  },
+
   // 3. Bloque Privado: Panel Técnico del Administrador (Solo acceso a Rol 1)
   {
     path: 'admin/dashboard',

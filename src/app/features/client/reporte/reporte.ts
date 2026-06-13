@@ -4,15 +4,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
 import { EvaluationService } from '../../../core/services/evaluation.service';
 
-// Inyección conforme de librerías nativas de renderizado gráfico en el cliente
+// Inyección exclusiva de jsPDF nativo (eliminamos html2canvas para la exportación vectorizada)
 import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
 
-/*
- * Decorador que define este artefacto como un componente Standalone,
- * especificando sus dependencias visuales, recursos asociados y
- * configuración necesaria para su integración dentro de la aplicación.
- */
 @Component({
   selector: 'app-reporte',
   standalone: true,
@@ -20,68 +14,26 @@ import html2canvas from 'html2canvas';
   templateUrl: './reporte.html',
   styleUrls: ['./reporte.css']
 })
-
-/*
- * Componente responsable de recuperar, procesar y presentar los resultados
- * de una evaluación normativa. Gestiona la visualización del diagnóstico,
- * la transformación segura del análisis generado por IA y la exportación
- * del informe corporativo a formato PDF.
- */
 export class ReporteComponent implements OnInit {
   
-  // Inyecciones funcionales de arquitectura nativa Angular 21
   private evaluationService = inject(EvaluationService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private sanitizer = inject(DomSanitizer);
 
-  /*
-   * Información principal del diagnóstico utilizada para construir
-   * la cabecera ejecutiva y los datos generales del reporte.
-   */
   public cabecera: any = null;
-
-  /*
-   * Colección de riesgos prioritarios identificados durante el análisis,
-   * utilizada para presentar las brechas más críticas detectadas.
-   */
   public top3Riesgos: any[] = [];
-
-  /*
-   * Contenedor seguro para el contenido HTML generado a partir del
-   * análisis narrativo elaborado por la inteligencia artificial.
-   */
   public htmlInformeIA: SafeHtml = '';
-  
-  /*
-   * Indicador visual utilizado para controlar estados de carga durante
-   * operaciones asíncronas de consulta o exportación de información.
-   */
   public isLoading: boolean = true;
-
-  /*
-   * Almacena mensajes de error funcionales o técnicos que pueden ser
-   * mostrados al usuario cuando ocurre una incidencia.
-   */
   public errorMessage: string | null = null;
 
-  /*
-   * Hook del ciclo de vida ejecutado tras la inicialización del componente.
-   * Dispara la recuperación automática del reporte solicitado.
-   */
   ngOnInit(): void {
     this.cargarReporteEjecutivo();
   }
 
-  /*
-   * Recupera la información completa del diagnóstico utilizando el
-   * identificador presente en la URL y actualiza el estado interno
-   * del componente para su posterior visualización.
-   */
   private cargarReporteEjecutivo(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
 
-    // Si la URL no contiene un identificador válido, se redirige al panel principal
     if (!idParam) {
       this.router.navigate(['/cliente/dashboard']);
       return;
@@ -91,19 +43,14 @@ export class ReporteComponent implements OnInit {
       next: (data) => {
         this.cabecera = data.cabecera;
         
-        // Normalización y casteo del puntaje de severidad de las brechas prioritarias
         this.top3Riesgos = (data.top3Riesgos || []).map((riesgo: any) => {
           const notaCruda = riesgo.puntaje_riesgo_momento ?? riesgo.puntaje_riesgo ?? riesgo.puntaje ?? 0;
-
           return {
             ...riesgo,
-
-            // Conversión a valor entero para facilitar la representación visual
             severidad_normalizada: Math.floor(parseFloat(notaCruda))
           };
         });
         
-        // Si existe un análisis generado por IA, se transforma a HTML seguro
         if (this.cabecera?.analisis_orientacion_ia) {
           this.htmlInformeIA = this.convertirMarkdownAHtmlSeguro(
             this.cabecera.analisis_orientacion_ia
@@ -114,35 +61,17 @@ export class ReporteComponent implements OnInit {
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage =
-          'No se pudo recuperar la información de este diagnóstico o el registro no existe.';
-
+        this.errorMessage = 'No se pudo recuperar la información de este diagnóstico o el registro no existe.';
         console.error('QA Log Senior [Carga Reporte]:', err);
       }
     });
   }
 
-  /*
-   * Convierte contenido generado en formato Markdown hacia HTML seguro
-   * para su representación en la interfaz, preservando encabezados,
-   * listas, subtítulos y párrafos estructurados.
-   */
   private convertirMarkdownAHtmlSeguro(textoMarkdown: string): SafeHtml {
-
-    // Si el contenido está vacío, se retorna una cadena vacía
     if (!textoMarkdown) return '';
 
-    // Sanamiento inicial para eliminar marcas residuales de formato itálico
-    let limpio = textoMarkdown.replace(
-      /(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)/g,
-      '$1'
-    );
-
-    // Conversión controlada de sintaxis Markdown de negritas a HTML
-    limpio = limpio.replace(
-      /\*\*(.*?)\*\*/g,
-      '<strong class="text-highlight">$1</strong>'
-    );
+    let limpio = textoMarkdown.replace(/(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)/g, '$1');
+    limpio = limpio.replace(/\*\*(.*?)\*\*/g, '<strong class="text-highlight">$1</strong>');
 
     const lineas = limpio.split('\n');
     let htmlResultado = '';
@@ -150,214 +79,323 @@ export class ReporteComponent implements OnInit {
 
     lineas.forEach(linea => {
       let l = linea.trim();
-
-      // Ignora líneas vacías para evitar etiquetas HTML innecesarias
       if (!l) return;
 
-      // CASO A: Encabezados de Sección de nivel 3 (### )
       if (l.startsWith('###')) {
-
-        // Si existe una lista abierta, se cierra antes de generar un encabezado
         if (dentroDeLista) {
           htmlResultado += '</ul>';
           dentroDeLista = false;
         }
-
         const textoTitulo = l.replace(/^###\s+/, '');
-
-        htmlResultado +=
-          `<h3 class="report-section-title">${textoTitulo}</h3>`;
+        htmlResultado += `<h3 class="report-section-title">${textoTitulo}</h3>`;
       }
-
-      // CASO B: Viñetas y listados de primer nivel (* o -)
-      else if (
-        l.startsWith('*') ||
-        l.startsWith('-') ||
-        l.startsWith('•')
-      ) {
-
-        // Se abre una lista únicamente cuando aún no existe una activa
+      else if (l.startsWith('*') || l.startsWith('-') || l.startsWith('•')) {
         if (!dentroDeLista) {
           htmlResultado += '<ul class="report-list-container">';
           dentroDeLista = true;
         }
-
         const textoLi = l.replace(/^[\*\-\•\s]+/, '');
-
-        htmlResultado +=
-          `<li class="report-list-item">${textoLi}</li>`;
+        htmlResultado += `<li class="report-list-item">${textoLi}</li>`;
       }
-
-      // CASO C: Índices Numerados (1. Tratamiento de Datos)
       else if (/^\d+\.\s+/.test(l)) {
-
-        // Garantiza el cierre correcto de listas previas
         if (dentroDeLista) {
           htmlResultado += '</ul>';
           dentroDeLista = false;
         }
-
         const posColon = l.indexOf(':');
-
-        // Si existe un separador ":", se divide el título y la descripción
         if (posColon !== -1) {
-
-          const encabezadoTitulo =
-            l.substring(0, posColon + 1).trim();
-
-          const cuerpoDescripcion =
-            l.substring(posColon + 1).trim();
-
-          htmlResultado +=
-            `<h4 class="report-subsection-title">${encabezadoTitulo}</h4>`;
-
+          const encabezadoTitulo = l.substring(0, posColon + 1).trim();
+          const cuerpoDescripcion = l.substring(posColon + 1).trim();
+          htmlResultado += `<h4 class="report-subsection-title">${encabezadoTitulo}</h4>`;
           if (cuerpoDescripcion) {
-            htmlResultado +=
-              `<p class="report-paragraph">${cuerpoDescripcion}</p>`;
+            htmlResultado += `<p class="report-paragraph">${cuerpoDescripcion}</p>`;
           }
-
         } else {
-
-          // Si no existe descripción, se representa únicamente el encabezado
-          htmlResultado +=
-            `<h4 class="report-subsection-title">${l}</h4>`;
+          htmlResultado += `<h4 class="report-subsection-title">${l}</h4>`;
         }
       }
-
-      // CASO D: Cuerpo de párrafos fluidos y limpios
       else {
-
-        // Garantiza el cierre de listas antes de generar texto libre
         if (dentroDeLista) {
           htmlResultado += '</ul>';
           dentroDeLista = false;
         }
-
-        htmlResultado +=
-          `<p class="report-paragraph">${l}</p>`;
+        htmlResultado += `<p class="report-paragraph">${l}</p>`;
       }
     });
 
-    // Cierre final de listas pendientes para mantener HTML válido
     if (dentroDeLista) htmlResultado += '</ul>';
-
-    // Sanitización controlada para permitir el renderizado seguro del HTML generado
     return this.sanitizer.bypassSecurityTrustHtml(htmlResultado);
   }
 
-  /*
-   * Redirige al usuario hacia el panel principal de cliente,
-   * conservando el flujo normal de navegación de la aplicación.
-   */
   public regresarAlPanel(): void {
     this.router.navigate(['/cliente/dashboard']);
   }
 
   /*
-   * Genera una representación PDF del informe visualizado en pantalla.
-   * Captura el contenido HTML, lo transforma en una imagen de alta
-   * resolución y construye un documento PDF multipágina.
+   * Exportador PDF Corporativo Nativo de Alta Fidelidad (Estilo IESS)
+   * Renderiza el contenido directamente mediante primitivas vectoriales y fuentes tipográficas
+   * garantizando texto seleccionable, nitidez perfecta y saltos de página automatizados.
+   */
+  /*
+   * Exportador PDF Corporativo Nativo de Alta Fidelidad
+   * Renderiza el contenido mediante primitivas vectoriales y fuentes tipográficas
    */
   public descargarPdf(): void {
-
-    // Obtiene el contenedor principal que será exportado al documento PDF
-    const elemento = document.getElementById('reporte-pdf-content');
-
-    if (!elemento) return;
+    if (!this.cabecera) return;
 
     this.isLoading = true;
 
-    const opcionesCanvas = {
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = 210;
+    const pageHeight = 297;
+    const marginX = 15;
+    let currentY = 20;
 
-      // Duplica la densidad de píxeles para mejorar la calidad de impresión
-      scale: 2,
+    //Recuperamos tanto el token criptográfico como el ID corto para el cuadro de texto
+    const cryptoToken = this.cabecera.codigo_verificacion || 'CÓDIGO NO DISPONIBLE';
+    const baseId = this.cabecera.id ? this.cabecera.id.substring(0, 8).toUpperCase() : 'LXP0607';
 
-      // Permite la carga de recursos externos compatibles con CORS
-      useCORS: true,
+    const drawPageDecorations = (pageNum: number, totalPages: number) => {
+      // --- ENCABEZADO FIJO ---
+      pdf.setDrawColor(31, 58, 138); 
+      pdf.setLineWidth(1);
+      pdf.line(marginX, 12, pageWidth - marginX, 12); 
 
-      allowTaint: false,
-      logging: false,
+      pdf.setFont('Helvetica', 'bold');
+      pdf.setFontSize(10);
+      pdf.setTextColor(31, 58, 138);
+      pdf.text('LEXYN PULSE PRO', marginX, 17);
+
+      pdf.setFont('Helvetica', 'normal');
+      pdf.setFontSize(8);
+      pdf.setTextColor(100, 116, 139);
+      // CORRECCIÓN: Uso de "Y" en lugar de "&"
+      pdf.text('MATRIZ DE TELEMETRÍA GLOBAL Y AUDITORÍA NATIVA', marginX, 21);
+      pdf.text(`EMISIÓN: ${new Date().toLocaleDateString('es-EC')}`, pageWidth - marginX - 45, 17);
+
+      pdf.setDrawColor(226, 232, 240);
+      pdf.setLineWidth(0.2);
+      pdf.line(marginX, 24, pageWidth - marginX, 24);
+
+      // --- PIE DE PÁGINA FIJO ---
+      pdf.setDrawColor(226, 232, 240);
+      pdf.line(marginX, pageHeight - 15, pageWidth - marginX, pageHeight - 15);
+
+      pdf.setFontSize(7);
+      pdf.setTextColor(148, 163, 184);
+      pdf.text(`Código de Verificación Criptográfica: ${cryptoToken} | Documento Digital Conforme a la LODPD Ecuador.`, marginX, pageHeight - 11);
       
-      /*
-       * Ajusta el contenedor clonado para mantener una apariencia uniforme
-       * durante el proceso de captura independiente del tamaño de pantalla.
-       */
-      onclone: (documentoClonado: Document) => {
-        const nodoClonado =
-          documentoClonado.getElementById('reporte-pdf-content');
+      const pageText = `Pág. ${pageNum} de ${totalPages}`;
+      pdf.text(pageText, pageWidth - marginX - 15, pageHeight - 11);
+    };
 
-        if (nodoClonado) {
-          nodoClonado.style.width = '1024px';
-          nodoClonado.style.maxWidth = '1024px';
-          nodoClonado.style.padding = '40px';
-          nodoClonado.style.backgroundColor = '#ffffff';
-        }
+    const checkPageBreak = (neededHeight: number) => {
+      if (currentY + neededHeight > pageHeight - 22) {
+        pdf.addPage();
+        currentY = 32; 
       }
     };
 
-    html2canvas(elemento, opcionesCanvas)
-      .then((canvas) => {
+    // ==========================================
+    // BLOQUE 1: TÍTULO Y RESUMEN
+    // ==========================================
+    currentY = 32;
+    pdf.setFont('Helvetica', 'bold');
+    pdf.setFontSize(16);
+    pdf.setTextColor(15, 23, 42);
+    // CORRECCIÓN: "CUMPLIMIENTO NORMATIVO" en lugar de "COMPLIANCE"
+    pdf.text('INFORME TÉCNICO DE CUMPLIMIENTO NORMATIVO', marginX, currentY);
+    
+    currentY += 6;
+    pdf.setFont('Helvetica', 'normal');
+    pdf.setFontSize(10);
+    pdf.setTextColor(71, 85, 105);
+    pdf.text('Evaluación automatizada bajo las disposiciones de la Ley Orgánica de Protección de Datos Personales', marginX, currentY);
 
-        // Conversión del contenido capturado a formato PNG
-        const imgData = canvas.toDataURL('image/png');
+    currentY += 8;
+    checkPageBreak(30);
+    pdf.setDrawColor(203, 213, 225);
+    pdf.setFillColor(248, 250, 252);
+    pdf.rect(marginX, currentY, pageWidth - (marginX * 2), 24, 'FD'); 
 
-        // Inicialización del documento PDF tamaño A4 en orientación vertical
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        
-        const pdfAnchoMM = 210;
-        const pdfAltoMM = 297;
+    pdf.setFont('Helvetica', 'bold');
+    pdf.setFontSize(9);
+    pdf.setTextColor(51, 65, 85);
+    pdf.text('Organización Evaluada:', marginX + 4, currentY + 6);
+    pdf.text('Nivel de Riesgo:', marginX + 4, currentY + 12);
+    pdf.text('Solución Asignada:', marginX + 4, currentY + 18);
 
-        // Escalado proporcional de la imagen respecto al ancho del PDF
-        const imgAltoMM =
-          (canvas.height * pdfAnchoMM) / canvas.width;
-        
-        let altoPendiente = imgAltoMM;
-        let posicionY = 0;
+    pdf.setFont('Helvetica', 'normal');
+    pdf.text(this.cabecera.empresa_nombre || 'Instituto Tecnológico Quito', marginX + 45, currentY + 6);
+    
+    const riesgoStr = (this.cabecera.nivel_riesgo || 'MEDIO').toUpperCase();
+    pdf.setFont('Helvetica', 'bold');
+    if (riesgoStr === 'ALTO' || riesgoStr === 'CRÍTICO' || riesgoStr === 'CRITICO') {
+      pdf.setTextColor(185, 28, 28); 
+    } else if (riesgoStr === 'MEDIO') {
+      pdf.setTextColor(217, 119, 6); 
+    } else {
+      pdf.setTextColor(21, 128, 61); 
+    }
+    pdf.text(riesgoStr, marginX + 45, currentY + 12);
 
-        // Inyección de la primera página del documento
-        pdf.addImage(
-          imgData,
-          'PNG',
-          0,
-          posicionY,
-          pdfAnchoMM,
-          imgAltoMM
-        );
+    pdf.setFont('Helvetica', 'normal');
+    pdf.setTextColor(51, 65, 85);
+    pdf.text(`Suite Lexyn ${this.cabecera.producto_recomendado || 'Pro + Care'}`, marginX + 45, currentY + 18);
 
-        altoPendiente -= pdfAltoMM;
+    pdf.setFontSize(8);
+    pdf.setTextColor(100, 116, 139);
+    // CORRECCIÓN: Solo los 8 primeros caracteres del UUID
+    pdf.text(`ID Evaluación: ${baseId}`, pageWidth - marginX - 45, currentY + 6);
 
-        // Bucle encargado de generar páginas adicionales cuando el contenido excede un A4
-        while (altoPendiente > 0) {
+    // ==========================================
+    // BLOQUE 2: MATRIZ DE BRECHAS CRÍTICAS (TABLA DINÁMICA)
+    // ==========================================
+    currentY += 32;
+    checkPageBreak(40);
+    
+    pdf.setFont('Helvetica', 'bold');
+    pdf.setFontSize(12);
+    pdf.setTextColor(31, 58, 138);
+    pdf.text('1. MATRIZ DE BRECHAS CRÍTICAS DETECTADAS', marginX, currentY);
+    
+    currentY += 6;
+    pdf.setFillColor(31, 58, 138);
+    pdf.rect(marginX, currentY, pageWidth - (marginX * 2), 7, 'F');
+    
+    pdf.setFont('Helvetica', 'bold');
+    pdf.setFontSize(9);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text('ID', marginX + 2, currentY + 5);
+    pdf.text('Categoría Normativa', marginX + 12, currentY + 5);
+    pdf.text('Componente de Riesgo Operativo', marginX + 60, currentY + 5);
+    pdf.text('Severidad', pageWidth - marginX - 22, currentY + 5);
 
-          posicionY = altoPendiente - imgAltoMM;
+    currentY += 7;
 
-          pdf.addPage();
+    // Renderizado dinámico de filas (CORRECCIÓN DESBORDAMIENTO)
+    this.top3Riesgos.forEach((riesgo, index) => {
+      
+      // Ajustamos el ancho máximo a 85mm para que nunca choque con la severidad
+      const textWidthMax = 85; 
+      const líneasPregunta = pdf.splitTextToSize(riesgo.texto_pregunta || '', textWidthMax);
+      const numeroDeLineas = líneasPregunta.length;
+      
+      // Cálculo inteligente de la altura de la fila: base de 14mm + 4mm por cada línea extra
+      const rowHeight = numeroDeLineas > 1 ? 12 + (numeroDeLineas * 4) : 15;
+      
+      checkPageBreak(rowHeight + 4);
+      
+      if (index % 2 === 0) {
+        pdf.setFillColor(241, 245, 249);
+        pdf.rect(marginX, currentY, pageWidth - (marginX * 2), rowHeight, 'F');
+      }
 
-          pdf.addImage(
-            imgData,
-            'PNG',
-            0,
-            posicionY,
-            pdfAnchoMM,
-            imgAltoMM
-          );
+      pdf.setFont('Helvetica', 'bold');
+      pdf.setFontSize(9);
+      pdf.setTextColor(51, 65, 85);
+      pdf.text(`0${index + 1}`, marginX + 2, currentY + 6);
 
-          altoPendiente -= pdfAltoMM;
+      pdf.setFont('Helvetica', 'normal');
+      pdf.setFontSize(8);
+      pdf.text(riesgo.tipo_categoria || 'Legal', marginX + 12, currentY + 6);
+
+      // Imprime el texto de la pregunta respetando el límite de ancho
+      pdf.text(líneasPregunta, marginX + 60, currentY + 5);
+
+      pdf.setFont('Helvetica', 'bold');
+      pdf.setTextColor(185, 28, 28);
+      pdf.text(`${riesgo.severidad_normalizada}.0/10`, pageWidth - marginX - 20, currentY + 6);
+
+      pdf.setFont('Helvetica', 'italic');
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(100, 116, 139);
+      const opcionCorta = riesgo.texto_opcion ? (riesgo.texto_opcion.substring(0, 70) + '...') : '';
+      
+      // Empuja el texto de la respuesta al fondo de la celda dinámica
+      const opcionY = currentY + rowHeight - 3;
+      pdf.text(`Respuesta: ${opcionCorta}`, marginX + 12, opcionY);
+
+      currentY += rowHeight;
+    });
+
+    // ==========================================
+    // BLOQUE 3: DICTAMEN DE AUDITORÍA IA
+    // ==========================================
+    currentY += 8;
+    checkPageBreak(25);
+
+    pdf.setFont('Helvetica', 'bold');
+    pdf.setFontSize(12);
+    pdf.setTextColor(31, 58, 138);
+    // CORRECCIÓN: Se eliminó el "IA EVALUATOR"
+    pdf.text('2. INFORME DE ORIENTACIÓN EJECUTIVO', marginX, currentY);
+    
+    currentY += 6;
+
+    if (this.cabecera?.analisis_orientacion_ia) {
+      const lineasRaw = this.cabecera.analisis_orientacion_ia.split('\n');
+      pdf.setTextColor(15, 23, 42);
+
+      lineasRaw.forEach((lineaStr: string) => {
+        let l = lineaStr.trim();
+        if (!l) return;
+
+        if (l.startsWith('###')) {
+          currentY += 4;
+          checkPageBreak(10);
+          const tituloLimpio = l.replace(/^###\s+/, '').replace(/\*\*/g, '');
+          pdf.setFont('Helvetica', 'bold');
+          pdf.setFontSize(10);
+          pdf.setTextColor(31, 58, 138);
+          pdf.text(tituloLimpio, marginX, currentY);
+          currentY += 5;
+        } 
+        else if (l.startsWith('*') || l.startsWith('-') || l.startsWith('•')) {
+          checkPageBreak(8);
+          const viñetaLimpia = l.replace(/^[\*\-\•\s]+/, '').replace(/\*\*/g, '');
+          pdf.setFont('Helvetica', 'normal');
+          pdf.setFontSize(9);
+          pdf.setTextColor(51, 65, 85);
+          
+          const lineasViñeta = pdf.splitTextToSize(`•  ${viñetaLimpia}`, pageWidth - (marginX * 2) - 4);
+          lineasViñeta.forEach((lineaSplit: string) => {
+            checkPageBreak(5);
+            pdf.text(lineaSplit, marginX + 4, currentY);
+            currentY += 4.5;
+          });
+        } 
+        else {
+          currentY += 2;
+          checkPageBreak(8);
+          const parrafoLimpio = l.replace(/\*\*/g, ''); 
+          pdf.setFont('Helvetica', 'normal');
+          pdf.setFontSize(9);
+          pdf.setTextColor(51, 65, 85);
+
+          const lineasParrafo = pdf.splitTextToSize(parrafoLimpio, pageWidth - (marginX * 2));
+          lineasParrafo.forEach((lineaSplit: string) => {
+            checkPageBreak(5);
+            pdf.text(lineaSplit, marginX, currentY);
+            currentY += 4.5;
+          });
+          currentY += 1.5;
         }
-
-        // Descarga final del documento generado
-        pdf.save('Reporte_Auditoria_LODPD_LexynPulse.pdf');
-
-        this.isLoading = false;
-      })
-      .catch((error) => {
-
-        this.isLoading = false;
-
-        console.error(
-          'Error crítico en el pipeline del exportador PDF:',
-          error
-        );
       });
+    }
+
+    // ==========================================
+    // CICLO FINAL: NUMERACIÓN Y DECORACIÓN
+    // ==========================================
+    const totalPages = (pdf as any).internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      pdf.setPage(i);
+      drawPageDecorations(i, totalPages);
+    }
+
+    // CORRECCIÓN: Nombre del archivo sin la palabra "Formal"
+    pdf.save(`Informe_Auditoria_LODPD_${this.cabecera.empresa_nombre ? this.cabecera.empresa_nombre.replace(/\s+/g, '_') : 'LexynPulse'}.pdf`);
+    
+    this.isLoading = false;
   }
 }

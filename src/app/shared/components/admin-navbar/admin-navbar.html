@@ -1,0 +1,34 @@
+<header class="admin-header">
+  <div class="brand-zone">
+    <i class="fa-solid fa-shield-halved brand-icon"></i>
+    <div class="brand-text">
+      <span class="app-title">LEXYN PULSE PRO</span>
+      <span class="app-subtitle">Matriz de Telemetría Global</span>
+    </div>
+  </div>
+
+  <nav class="admin-nav-links">
+    <button class="nav-item" routerLink="/admin/dashboard" routerLinkActive="active">
+      <i class="fa-solid fa-chart-line"></i> Dashboard
+    </button>
+    <button class="nav-item" routerLink="/admin/clientes" routerLinkActive="active">
+      <i class="fa-solid fa-users-gear"></i> Clientes
+    </button>
+    <button class="nav-item" routerLink="/admin/preguntas" routerLinkActive="active">
+      <i class="fa-solid fa-list-check"></i> Cuestionario
+    </button>
+    <a class="nav-item btn-auditoria" routerLink="/auditoria" target="_blank">
+      <i class="fa-solid fa-certificate"></i> Verificar PDF
+    </a>
+  </nav>
+
+  <div class="user-zone">
+    <div class="user-meta">
+      <span class="user-name">{{ nombreAdmin }}</span>
+      <span class="user-role"><i class="fa-solid fa-user-shield"></i> Administrador</span>
+    </div>
+    <button (click)="cerrarSesion()" class="btn-logout" title="Cerrar Sesión Segura">
+      <i class="fa-solid fa-right-from-bracket"></i>
+    </button>
+  </div>
+</header>

@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { PreguntaService } from '../../../core/services/pregunta.service';
-import { jwtDecode } from 'jwt-decode';
+import { AdminNavbarComponent } from '../../../shared/components/admin-navbar/admin-navbar';
 
 /**
  * Componente Standalone encargado de la administración integral
@@ -15,7 +15,7 @@ import { jwtDecode } from 'jwt-decode';
 @Component({
   selector: 'app-admin-preguntas',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, AdminNavbarComponent],
   templateUrl: './preguntas.html',
   styleUrls: ['./preguntas.css']
 })
@@ -41,8 +41,6 @@ export class PreguntasComponent implements OnInit {
   // VARIABLES DE ESTADO DEL COMPONENTE
   // ==========================================================================
   
-  /** Nombre del administrador autenticado extraído desde el JWT */
-  public nombreAdmin: string = '';
 
   /** Catálogo completo de preguntas recuperadas desde la API */
   public preguntas: any[] = [];
@@ -134,32 +132,9 @@ export class PreguntasComponent implements OnInit {
    * Valida la sesión activa y carga el catálogo de preguntas.
    */
   ngOnInit(): void {
-    this.validarIdentidadYExtraerDatos();
+    this.cargarCatalogoPreguntas();
   }
 
-  /**
-   * Valida la existencia y estructura del JWT.
-   * Si el token es válido, extrae el nombre del administrador
-   * y procede a cargar la información principal.
-   */
-  private validarIdentidadYExtraerDatos(): void {
-    const token = this.authService.getToken();
-
-    if (!token) {
-      this.cerrarSesion();
-      return;
-    }
-
-    try {
-      const payload: any = jwtDecode(token);
-
-      this.nombreAdmin = payload.nombre || 'Administrador Core';
-
-      this.cargarCatalogoPreguntas();
-    } catch {
-      this.cerrarSesion();
-    }
-  }
 
   /**
    * Recupera desde el backend el catálogo completo de preguntas
@@ -413,25 +388,5 @@ export class PreguntasComponent implements OnInit {
     setTimeout(() => this.toastData.show = false, 5000);
   }
 
-  /**
-   * Navega hacia el dashboard administrativo principal.
-   */
-  public irADashboard(): void {
-    this.router.navigate(['/admin/dashboard']);
-  }
 
-  /**
-   * Navega hacia el módulo de administración de clientes.
-   */
-  public irAGestionClientes(): void {
-    this.router.navigate(['/admin/clientes']);
-  }
-
-  /**
-   * Finaliza la sesión actual y redirige al login.
-   */
-  public cerrarSesion(): void {
-    this.authService.logout();
-    this.router.navigate(['/auth/login']);
-  }
 }

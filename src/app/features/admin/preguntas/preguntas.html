@@ -18,57 +18,7 @@
     </div>
   }
 
-  <!--
-   * Encabezado de navegación del panel administrativo.
-   * Concentra la identidad de la plataforma, los accesos
-   * a los módulos del sistema y los datos del administrador activo.
-  -->
-  <header class="admin-header">
-
-    <!--
-     * Bloque de identidad visual de la marca.
-     * Presenta el ícono institucional, el nombre del producto
-     * y el módulo operativo activo en la sesión administrativa.
-    -->
-    <div class="brand-zone">
-      <i class="fa-solid fa-shield-halved brand-icon"></i>
-      <div class="brand-text">
-        <span class="app-title">LEXYN PULSE PRO</span>
-        <span class="app-subtitle">Matriz de Telemetría Global</span>
-      </div>
-    </div>
-
-    <!--
-     * Barra de navegación entre módulos administrativos del sistema.
-     * El ítem activo refleja el módulo en uso mediante la clase `active`.
-     * Los botones inactivos invocan métodos de enrutamiento del componente.
-    -->
-    <nav class="admin-nav-links">
-      <!-- Botón que navega al módulo de telemetría y métricas del dashboard -->
-      <button class="nav-item" (click)="irADashboard()"><i class="fa-solid fa-chart-line"></i> Dashboard</button>
-      <!-- Botón que navega al módulo de gestión y administración de clientes -->
-      <button class="nav-item" (click)="irAGestionClientes()"><i class="fa-solid fa-users-gear"></i> Clientes</button>
-      <button class="nav-item active"><i class="fa-solid fa-list-check"></i> Cuestionario</button>
-    </nav>
-
-    <!--
-     * Panel de metadatos e interacciones del administrador autenticado.
-     * Expone el nombre del administrador, su rol institucional y
-     * el control de cierre de sesión segura del sistema.
-    -->
-    <div class="user-zone">
-      <div class="user-meta">
-        <!-- Datos del perfil administrativo inyectados desde el componente -->
-        <span class="user-name">{{ nombreAdmin }}</span>
-        <span class="user-role"><i class="fa-solid fa-user-shield"></i> Administrador Core</span>
-      </div>
-      <!-- Botón que invoca el método de cierre de sesión y limpieza del token JWT -->
-      <button (click)="cerrarSesion()" class="btn-logout" title="Cerrar Sesión Segura">
-        <i class="fa-solid fa-right-from-bracket"></i>
-      </button>
-    </div>
-
-  </header>
+  <app-admin-navbar></app-admin-navbar>
 
   <!--
    * Área principal de contenido del módulo de ponderación normativa.
