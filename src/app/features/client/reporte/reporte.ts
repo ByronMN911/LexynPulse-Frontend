@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
 import { EvaluationService } from '../../../core/services/evaluation.service';
 
-// Inyección exclusiva de jsPDF nativo (eliminamos html2canvas para la exportación vectorizada)
+// Inyección exclusiva de jsPDF nativo 
 import { jsPDF } from 'jspdf';
 
 @Component({
@@ -136,10 +136,7 @@ export class ReporteComponent implements OnInit {
    * Renderiza el contenido directamente mediante primitivas vectoriales y fuentes tipográficas
    * garantizando texto seleccionable, nitidez perfecta y saltos de página automatizados.
    */
-  /*
-   * Exportador PDF Corporativo Nativo de Alta Fidelidad
-   * Renderiza el contenido mediante primitivas vectoriales y fuentes tipográficas
-   */
+
   public descargarPdf(): void {
     if (!this.cabecera) return;
 
@@ -169,7 +166,6 @@ export class ReporteComponent implements OnInit {
       pdf.setFont('Helvetica', 'normal');
       pdf.setFontSize(8);
       pdf.setTextColor(100, 116, 139);
-      // CORRECCIÓN: Uso de "Y" en lugar de "&"
       pdf.text('MATRIZ DE TELEMETRÍA GLOBAL Y AUDITORÍA NATIVA', marginX, 21);
       pdf.text(`EMISIÓN: ${new Date().toLocaleDateString('es-EC')}`, pageWidth - marginX - 45, 17);
 
@@ -203,7 +199,6 @@ export class ReporteComponent implements OnInit {
     pdf.setFont('Helvetica', 'bold');
     pdf.setFontSize(16);
     pdf.setTextColor(15, 23, 42);
-    // CORRECCIÓN: "CUMPLIMIENTO NORMATIVO" en lugar de "COMPLIANCE"
     pdf.text('INFORME TÉCNICO DE CUMPLIMIENTO NORMATIVO', marginX, currentY);
     
     currentY += 6;
@@ -245,7 +240,7 @@ export class ReporteComponent implements OnInit {
 
     pdf.setFontSize(8);
     pdf.setTextColor(100, 116, 139);
-    // CORRECCIÓN: Solo los 8 primeros caracteres del UUID
+
     pdf.text(`ID Evaluación: ${baseId}`, pageWidth - marginX - 45, currentY + 6);
 
     // ==========================================
@@ -328,7 +323,7 @@ export class ReporteComponent implements OnInit {
     pdf.setFont('Helvetica', 'bold');
     pdf.setFontSize(12);
     pdf.setTextColor(31, 58, 138);
-    // CORRECCIÓN: Se eliminó el "IA EVALUATOR"
+  
     pdf.text('2. INFORME DE ORIENTACIÓN EJECUTIVO', marginX, currentY);
     
     currentY += 6;
@@ -393,7 +388,6 @@ export class ReporteComponent implements OnInit {
       drawPageDecorations(i, totalPages);
     }
 
-    // CORRECCIÓN: Nombre del archivo sin la palabra "Formal"
     pdf.save(`Informe_Auditoria_LODPD_${this.cabecera.empresa_nombre ? this.cabecera.empresa_nombre.replace(/\s+/g, '_') : 'LexynPulse'}.pdf`);
     
     this.isLoading = false;

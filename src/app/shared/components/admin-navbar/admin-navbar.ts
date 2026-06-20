@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router'; // RouterModule es clave aquí
+import { Router, RouterModule } from '@angular/router'; 
 import { AuthService } from '../../../core/services/auth.service';
 import { jwtDecode } from 'jwt-decode';
 
@@ -8,8 +8,8 @@ import { jwtDecode } from 'jwt-decode';
   selector: 'app-admin-navbar',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './admin-navbar.html', // Corregido: sin .component
-  styleUrls: ['./admin-navbar.css']   // Corregido: sin .component
+  templateUrl: './admin-navbar.html',
+  styleUrls: ['./admin-navbar.css']   
 })
 export class AdminNavbarComponent implements OnInit {
   
